@@ -1,0 +1,19 @@
+#wikiBoxOpen(${table})
+#wikiBoxTitle("Overview of not linked trackeritems")
+<table>
+    	<tbody>
+<tr>
+<th>Ticket id</th>
+<th>Ticket name</th>
+</tr>
+<tr>
+          #foreach($object in $table)
+           #trOpen
+ <td class="compact" style="white-space"><span class="subtext">#esc($object.getTicketID())</td>
+        	<td><a href="$object.getTicketLink()">$object.getTicketName()</a></td>
+        	 #trClose
+	      #end
+</tr>
+	     	</tbody>
+	</table>
+#wikiBoxClose()

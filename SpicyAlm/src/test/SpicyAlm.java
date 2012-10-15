@@ -1,4 +1,4 @@
-package com.intland.codebeamer.wiki.plugins;
+package test;
 
 
 
@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.velocity.VelocityContext;
 
+import test.*;
+
 
 import com.ecyrd.jspwiki.WikiContext;
 
@@ -17,7 +19,6 @@ import com.intland.codebeamer.persistence.dto.ArtifactDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.persistence.dto.UserDto;
 import com.intland.codebeamer.persistence.dto.WikiPageDto;
-import com.intland.codebeamer.wiki.plugins.*;
 import com.intland.codebeamer.wiki.plugins.base.AbstractCodeBeamerWikiPlugin;
 import com.intland.codebeamer.wiki.plugins.core.Logic;
 import com.intland.codebeamer.wiki.plugins.core.Printer;

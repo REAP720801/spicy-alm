@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.intland.codebeamer.wiki.plugins;
+package test;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;

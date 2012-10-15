@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 
-import com.intland.codebeamer.persistence.dto.TrackerItemDto;
+import com.intland.codebeamer.persistence.dto.*;
 import com.intland.codebeamer.wiki.plugins.core.Logic;
 import com.intland.codebeamer.wiki.plugins.core.Printer;
 import com.intland.codebeamer.wiki.plugins.core.Reader;

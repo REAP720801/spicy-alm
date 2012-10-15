@@ -1,0 +1,32 @@
+#wikiBoxOpen(${table})
+#wikiBoxTitle("Overview of trackeritems linked to artifakte")
+<table>
+    	<tbody>
+<tr>
+<th>Ticket id</th>
+<th>Ticket name</th>
+<th>Artifakt name	</th>
+</tr>
+<tr>
+    #foreach($object in $table)
+    #trOpen
+
+	<td class="compact" style="white-space"><span class="subtext">#esc($object.getTicketID())</td>
+
+      <td class="compact"><a href="$object.getTicketLink()">$object.getTicketName()</a></td>
+
+<td>
+<ul>
+		#foreach($attachment in $object.getAttachment() )
+<li><a href="$attachment.getUrl()">$attachment.getName()</a></li>
+        #end
+</ul>
+</td>
+</tr>
+		 
+
+     #trClose
+    #end
+  </tbody>
+</table>
+#wikiBoxClose()
