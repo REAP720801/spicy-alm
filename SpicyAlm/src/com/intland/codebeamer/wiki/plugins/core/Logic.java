@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
-
-
 import com.intland.codebeamer.persistence.dto.ArtifactDto;
-import com.intland.codebeamer.persistence.dto.ProjectDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.wiki.plugins.support.TicketResults;
 

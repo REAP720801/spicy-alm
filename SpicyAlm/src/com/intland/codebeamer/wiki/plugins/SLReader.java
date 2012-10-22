@@ -1,7 +1,7 @@
 /**
  * 
  */
-package test;
+package com.intland.codebeamer.wiki.plugins;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -22,6 +22,8 @@ import com.intland.codebeamer.persistence.dto.TrackerItemAttachmentDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto.Flag;
 import com.intland.codebeamer.persistence.dto.UserDto;
+import com.intland.codebeamer.persistence.dto.base.ReferableDto;
+import com.intland.codebeamer.persistence.dto.base.VersionReferenceDto;
 import com.intland.codebeamer.remoting.RemoteApi;
 import com.intland.codebeamer.remoting.RemoteApiFactory;
 
@@ -110,79 +112,43 @@ public class SLReader {
 	/**Returns all available Associations for current user
 	 * @return  List<Object> List of Object[] pattern: [0]=assoc-object [1]=trackerItem-object [2]=attachment-object)
 	 */
-	//TODO: still no response by inteland for requested methode which is missing
+	//TODO: not always TrackerItemDto object
 	public List<Object> readAllAssociations()	//from current project
 	{
 		//all Associations, unabhängig welcher Tracker
 		List<AssociationDto<?,?>> tempAllAssoc = AssociationManager.getInstance().findAll(user);
 		List<Object> allAssoc = new ArrayList<Object>();
 		
-			//for (int s = 0; s< tempAllAssoc.length;s++) 
-			//	for (int s = 0; s< 10;s++) 
-		{
-			//AssociationDto assoc =tempAllAssoc[s];				
-			//if (assoc.getTo().getId() >1000)//because 1000 is not allowed as an Artifact-id nor trackerItem-id
-			{
-				
-			//*************löschbar, nur für Testzwecke*************
-				String serviceUrl = "http://localhost:8080/cb/remote-api";
-				String login ="bond";
-				String password = "007";	
-			  RemoteApi api =null;
-			try {
-				api = RemoteApiFactory.getInstance().connect(serviceUrl);
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			   String token = api.login(login, password);
+		String test = "";
+		Iterator<AssociationDto<?, ?>> itrAllAssoc = tempAllAssoc.iterator();
+	   	while(itrAllAssoc.hasNext()) {	//goes through AssociationDto<?,?>-List
+	   		AssociationDto<?, ?> tempAssoc = itrAllAssoc.next();
+	   		AssociationDto<?, ?> assoc = AssociationManager.getInstance().findById(user, tempAssoc.getId());	
 
-				//*******************Dummy values********************** 
-				Object[] tempAssoc = new Object [3]; //[0]=assoc-object [1]=trackerItem-object [2]=attachment-object)
-				tempAssoc[0] = api.findAssociationById(token, 5);
-				tempAssoc[1] = api.findTrackerItemById(token,1013 );  //trackeritem
-				tempAssoc[2] = api.findArtifactById(token, 1028);	//artifact
-				allAssoc.add(tempAssoc);
+				ReferableDto origin = assoc.getFrom().getDto();
 				
-				 Object[] tempAssocA = new Object [3];
-				 tempAssocA[0] =  api.findAssociationById(token, 4);
-				 tempAssocA[1] = api.findTrackerItemById(token,1003 );  //trackeritem
-				 tempAssocA[2] = api.findArtifactById(token, 1027);	//artifact
-				allAssoc.add(tempAssocA);
-				
-				 Object[] tempAssocB = new Object [3];
-				 tempAssocB[0] =  api.findAssociationById(token, 8);
-				 tempAssocB[1] = api.findTrackerItemById(token,1002 );  //trackeritem
-				 tempAssocB[2] = api.findArtifactById(token, 1021);	//artifact
-				allAssoc.add(tempAssocB);
-			
-				 Object[] tempAssocC = new Object [3];
-				 tempAssocC[0] =  api.findAssociationById(token, 3);
-				 tempAssocC[1] = api.findTrackerItemById(token,1000 );  //trackeritem
-				 tempAssocC[2] = api.findArtifactById(token, 1024);	//artifact
-				allAssoc.add(tempAssocC);
-				
-				 Object[] tempAssocD = new Object [3];
-				 tempAssocD[0] =  api.findAssociationById(token, 9);
-				 tempAssocD[1] = api.findTrackerItemById(token,1016 );  //trackeritem
-				 tempAssocD[2] = api.findArtifactById(token, 1036);	//artifact
-				allAssoc.add(tempAssocD);
-				
-				 Object[] tempAssocE = new Object [3];
-				 tempAssocE[0] =  api.findAssociationById(token, 10);
-				 tempAssocE[1] = api.findTrackerItemById(token,1009 );  //trackeritem
-				 tempAssocE[2] = api.findArtifactById(token, 1021);	//artifact
-				allAssoc.add(tempAssocE);
-				
-				 Object[] tempAssocF = new Object [3];
-				 tempAssocF[0] =  api.findAssociationById(token, 11);
-				 tempAssocF[1] = api.findTrackerItemById(token,1009 );  //trackeritem
-				 tempAssocF[2] = api.findArtifactById(token, 1025);	//artifact
-				allAssoc.add(tempAssocF);
-					//System.out.println (tempAssoc[0] +" "+ tempAssoc[1] + " " +tempAssoc[2]  );
+				ReferableDto originTo = assoc.getTo().getDto();
+				ReferableDto originFrom = assoc.getFrom().getDto();
+
+				ArtifactDto toArtifact =null;
+				if (originTo instanceof ArtifactDto) {
+					 toArtifact = (ArtifactDto) originTo;
+				}
 					
-					//***********löschen nur zum testen********
-				}			
+				TrackerItemDto fromItem =null;
+				if (originFrom instanceof TrackerItemDto) {
+					fromItem = (TrackerItemDto) originFrom;
+				}
+				
+				if (toArtifact!=null && fromItem !=null)
+				{
+				Object[] tempFinalAssoc = new Object [3]; //[0]=AssociationDto object [1]=trackerItem object [2]=attachment object)
+				tempFinalAssoc[0] = assoc;
+				tempFinalAssoc[1] = fromItem;  //trackeritem
+				tempFinalAssoc[2] = toArtifact;	//artifact
+				allAssoc.add(tempFinalAssoc);
+				//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
+				}
 			}
 		return allAssoc;
 	} 

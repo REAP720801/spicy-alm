@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.intland.codebeamer.persistence.dto.ArtifactDto;
-import com.intland.codebeamer.persistence.dto.AssociationDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.wiki.plugins.core.Logic;
 

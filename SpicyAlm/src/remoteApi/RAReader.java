@@ -173,10 +173,6 @@ public class RAReader {
 		{
 			//Tracker auslesen
 			TrackerDto trackers[] = api.findAllTrackers(token);	
-				for (int i = 0; i< trackers.length;i++) 
-				{
-					TrackerDto tracker = trackers[i];
-				}
 			List<TrackerDto> list = Arrays.asList(trackers);
 			return list;
 		}
@@ -264,11 +260,6 @@ public class RAReader {
 	private static UserDto[] readAllUsers()
 	{
 				UserDto users[] = api.findAllUsers(token);
-				for (int i = 0; i< users.length; i++)
-				{
-					UserDto user = users[i];
-					//System.out.println("user information: "+ user.getName() + " ...");
-				}
 			return users;
 	}
 	
@@ -280,10 +271,13 @@ public class RAReader {
 			//all Associations
 			AssociationDto[] tempAllAssoc = api.findAllAssociations(token);
 			List <Object> allAssoc = new ArrayList<Object>();
-
+			String test = "";
 			for (int s = 0; s< tempAllAssoc.length;s++) 
 			{
-				AssociationDto assoc =tempAllAssoc[s];				
+				AssociationDto assoc =tempAllAssoc[s];	
+				test = test + " "+ Integer.toString(assoc.getId());
+				
+				
 				if (assoc.getTo().getId() >1000)//because 1000 is not allowed as an Artifact-id nor trackerItem-id
 				{
 					Object[] tempAssoc = new Object [3]; //[0]=AssociationDto object [1]=trackerItem object [2]=attachment object)
@@ -291,9 +285,10 @@ public class RAReader {
 					tempAssoc[1] = api.findTrackerItemById(token, assoc.getFrom().getId());  //trackeritem
 					tempAssoc[2] = api.findArtifactById(token, assoc.getTo().getId());	//artifact
 					allAssoc.add(tempAssoc);
-					//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
+					System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
 				}
 			}
+			System.out.println(test);	//print out all available association ids
 			return allAssoc;
 		}
 		

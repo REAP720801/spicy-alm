@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 
-import com.intland.codebeamer.persistence.dto.*;
+import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.wiki.plugins.core.Logic;
 import com.intland.codebeamer.wiki.plugins.core.Printer;
 import com.intland.codebeamer.wiki.plugins.core.Reader;
@@ -45,8 +45,8 @@ public class StandAloneApplication {
 		map.put("user", login);
 		map.put("password", password);
 		//map.put("projectId", "2");	 //TODO: in process
-		map.put("display", "chart");	//input: chart or table
-		map.put("trackerId", "5");	    //Pattern: specific values as int,int,int,... or for a full search use: "" -->alle
+		map.put("display", "table");	//input: chart or table
+		map.put("trackerId", "5,6,7");	    //Pattern: specific values as int,int,int,... or for a full search use: "" -->alle
 		map.put("notLinked", "true");
 		
 		//read user parameters
@@ -108,7 +108,7 @@ public class StandAloneApplication {
 			Iterator<VelocityTable> itrResults= table.iterator();
 		   	while(itrResults.hasNext()) {	//runs just once, later //VelocityTable-Object 
 		   		VelocityTable tempResult =  itrResults.next();
-		   			System.out.println (tempResult.getTicketID() + " " + tempResult.getTicketLink()); 
+		   			System.out.println (tempResult.getTicketID() + " "+ tempResult.getTicketName()+ " " + tempResult.getTicketLink()); 
 		   			
 		   			List<AttachmentTable> attResults = tempResult.getAttachment();
 		   			if (!readerObject.getNoLinked()) //needs it, otherwise nullpointerException of calling not existing Artifacts

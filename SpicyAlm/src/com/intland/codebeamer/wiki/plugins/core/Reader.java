@@ -14,7 +14,7 @@ import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
 /**Centralized Reader Class for SpicyAlm Plugin and StandAloneApplication
  * Enables to read user input values  and set various parameters
  * @author Alexander Börsch
- *
+ * 
  */
 public class Reader {
 

@@ -8,7 +8,6 @@ import java.util.List;
 
 import com.intland.codebeamer.persistence.dto.ArtifactDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
-import com.intland.codebeamer.persistence.dto.base.NamedDto;
 
 /**Class combines one TrackerItemDto (Ticket) Object to multiple various Artifacts
  * Required for outpout in VeloCity style

@@ -1,6 +1,4 @@
-package test;
-
-
+package com.intland.codebeamer.wiki.plugins;
 
 import java.util.List;
 import java.util.Map;
@@ -10,20 +8,17 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.velocity.VelocityContext;
 
-import test.*;
-
 
 import com.ecyrd.jspwiki.WikiContext;
 
-import com.intland.codebeamer.persistence.dto.ArtifactDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.persistence.dto.UserDto;
-import com.intland.codebeamer.persistence.dto.WikiPageDto;
 import com.intland.codebeamer.wiki.plugins.base.AbstractCodeBeamerWikiPlugin;
 import com.intland.codebeamer.wiki.plugins.core.Logic;
 import com.intland.codebeamer.wiki.plugins.core.Printer;
 import com.intland.codebeamer.wiki.plugins.core.Reader;
 import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
+
 
 
 /**SpicyAlm Plugin
@@ -32,6 +27,8 @@ import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
  * @author Alexander Börsch
  * September 2012
  *
+ * Velocity templates are available in project folder /velocityTemplate
+ * both have to be copied into codebeamer folder ...\tomcat\webapps\cb\config\templates\wiki-plugin
  */
 public class SpicyAlm extends AbstractCodeBeamerWikiPlugin {
 	
@@ -104,6 +101,7 @@ public class SpicyAlm extends AbstractCodeBeamerWikiPlugin {
 		}
 
 		return output;
+		
 	}
 
 	
