@@ -21,10 +21,12 @@ import com.intland.codebeamer.wiki.plugins.support.VelocityTable;
 public class Printer {
 	
 	private GlobalVariable globalVariable = null;
+	private Reader reader = null;
 	
-	public Printer (GlobalVariable globalVariable)
+	public Printer (GlobalVariable globalVariable, Reader reader)
 	{
 		this.globalVariable =globalVariable;
+		this.reader = reader;
 	}
 	
 	/**Usable for Attachment & TrackerItem-Prints in Plugin-Style
@@ -75,13 +77,15 @@ public class Printer {
 		/**Provides output in table structure for velocity template
 		 * @param results List of List with position [0] List<Object> (positive linked TrackerItems) [1] List<Object> (negative linked TrackerItems)
 		 * @return List <VelocityTable> (getTicketID, getTicketLink, getAttachmentLink)
+		 * Change "limit" paramater, otherwise standard value for ouptut limitation is 100 
 		 */
 		public List printTrackerItemsAscii (List<List<Object>> results, boolean notLinked)
-		{
+		{	int counter =0; 
 			List<VelocityTable> list = new ArrayList<VelocityTable>();
 			
 			Iterator<List<Object>> itrResults= results.iterator();
 		   	itrResults.hasNext(); {	
+		   	
 		   		if (notLinked)			//if "notlinked" is true than 
 		   			itrResults.next();	//jump over the positveTrackerItems
 		   		List<Object> tempResult = itrResults.next();
@@ -91,32 +95,42 @@ public class Printer {
 		   			Iterator<Object> itrResult= tempResult.iterator();
 		   			while(itrResult.hasNext()) {	
 		   				TrackerItemDto tempTrackerResults = (TrackerItemDto) itrResult.next();	
+		   				if (counter < reader.getOutputLimitation())	//output limitation 
+		   				{
 		   					Integer trackerID =  tempTrackerResults.getId();
 		   					String trackerName = tempTrackerResults.getName();
 		   					String trackerUrl= buildUrl ( tempTrackerResults.getUrlLink()) ;
 		   					List<AttachmentTable> artifact = null;		//do not exist, because notLinked TrackerItems
-		   					
+		   				
 		   					list.add(new VelocityTable(trackerID, trackerName,  trackerUrl , artifact));	   					
+		   					
+		   				}
+		   				counter++;
 		   				}
 		   			
 		   		}
-		   		else	//print positive TrackerItems linked Attachments 
+		   		else	//print positive TrackerItems linked to Attachments 
 		   		{
 			   		Iterator<Object> itrResult= tempResult.iterator();
 		   			while(itrResult.hasNext()) {	
 		   				TicketResults tempTrackerResults = (TicketResults) itrResult.next();	
+		   				if (counter < reader.getOutputLimitation())	//output limitation 
+		   				{
 		   					Integer trackerID =  tempTrackerResults.getTicket().getId();
 		   					String trackerName = tempTrackerResults.getTicket().getName();
 		   					String trackerUrl= buildUrl ( tempTrackerResults.getTicket().getUrlLink()) ; 
 		   					
 		   					List<ArtifactDto> attachments=  tempTrackerResults.getArtifacts();
 		   					List<AttachmentTable> artifact = convertArtifact(attachments);	//convert Attachments to velocity template usable pattern
-				
+		   		
 		   					list.add(new VelocityTable(trackerID, trackerName,  trackerUrl , artifact));	   					
+		   				
+		   				}
+		   				counter++;
 		   				}
 		   			}
 		   		}
-	   	
+		   	
 		   	return list;
 		}
 		

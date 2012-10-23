@@ -37,4 +37,6 @@ public class GlobalVariable {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+	
+	public static int limitation = 100; //standard value
 }

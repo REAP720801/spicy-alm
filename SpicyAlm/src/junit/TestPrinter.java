@@ -35,7 +35,7 @@ public class TestPrinter {
 		
 		GlobalVariable globalVariable = new GlobalVariable();
 		globalVariable.setUrl("http://"+ "localhost" + ":" + 8080 + "/cb" ); 
-		printer = new Printer(globalVariable);
+		printer = new Printer(globalVariable, null);
 		
 		//generate test data 
 		GenerateTestData generateTestData = new GenerateTestData();

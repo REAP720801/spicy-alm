@@ -285,7 +285,7 @@ public class RAReader {
 					tempAssoc[1] = api.findTrackerItemById(token, assoc.getFrom().getId());  //trackeritem
 					tempAssoc[2] = api.findArtifactById(token, assoc.getTo().getId());	//artifact
 					allAssoc.add(tempAssoc);
-					System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
+					//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
 				}
 			}
 			System.out.println(test);	//print out all available association ids

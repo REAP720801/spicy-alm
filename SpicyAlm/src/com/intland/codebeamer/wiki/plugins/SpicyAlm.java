@@ -44,8 +44,9 @@ public class SpicyAlm extends AbstractCodeBeamerWikiPlugin {
 		SLReader slreader = new SLReader (user);
 		Logic logic = new Logic ();
 		GlobalVariable globalVariable = new GlobalVariable();
-		Printer printer = new Printer(globalVariable);
 		Reader readerObject = new Reader(globalVariable);
+		Printer printer = new Printer(globalVariable,readerObject);
+		
 		HttpServletRequest httpRequest = context.getHttpRequest();	//required for address creating
 		List<List<Object>>  results = null;
 		

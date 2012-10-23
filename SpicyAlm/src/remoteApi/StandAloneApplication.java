@@ -30,7 +30,7 @@ public class StandAloneApplication {
 		RAReader raReader =new RAReader();
 		GlobalVariable globalVariable = new GlobalVariable();
 		Reader readerObject = new Reader(globalVariable);
-		Printer printer = new Printer(globalVariable);
+		Printer printer = new Printer(globalVariable,readerObject );
 		Logic logic = new Logic ();
 		List<List<Object>>  results = null;
 		
@@ -48,6 +48,7 @@ public class StandAloneApplication {
 		map.put("display", "table");	//input: chart or table
 		map.put("trackerId", "5,6,7");	    //Pattern: specific values as int,int,int,... or for a full search use: "" -->alle
 		map.put("notLinked", "true");
+		map.put("limit", "2");
 		
 		//read user parameters
 		readerObject.readParameterSAloneApp(map);

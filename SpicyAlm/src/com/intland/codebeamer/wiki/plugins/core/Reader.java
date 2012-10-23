@@ -25,6 +25,7 @@ public class Reader {
 	private int[] trackerID =null;	
 	private String user ="noValue";
 	private String password ="noValue";
+	private int outputLimitation =100;	//standard value for output
 	
 	private Boolean notLinked = false;
 	private Boolean tracker = false;
@@ -50,6 +51,28 @@ public class Reader {
 		this.globalVariable = globalVariable;
 	}
 	
+	/**Get number for output limitation
+	 * @return int 
+	 */
+	public int getOutputLimitation() {
+		return outputLimitation;
+	}
+
+	/**Cast String value (user input) to integer.
+	 * Set output limitation
+	 * @param outputLimitation String value 
+	 */
+	public void setOutputLimitation(String outputLimitation) {
+		int temp = GlobalVariable.limitation;
+		try {
+			 temp = Integer.parseInt(outputLimitation);
+		} 
+			catch (NumberFormatException e) {
+				System.out.println("i ist keine Zahl. " + e.getMessage());
+			}
+		this.outputLimitation = temp;
+	}
+	
 	public String getUrl() {
 		return url;
 	}
@@ -57,11 +80,6 @@ public class Reader {
 	public void setUrl(String url) {
 				if (!url.isEmpty())		//TODO: testcases schreiben, noch fehlerhaft
 						{
-					//'' ja
-					//'http://asdfPc:8080/cb' ja
-					//' 'nein 
-					//(com.ecyrd.jspwiki.plugin.PluginException:Plugin failed, java.lang.StringIndexOutOfBoundsException:String index out of range: -2)
-					
 					int start = 0;
 					int end = 0;
 						try{	
@@ -254,6 +272,7 @@ public class Reader {
 		String projectId = (String)params.get("projectId");		//number
 		String trackerId = (String)params.get("trackerId");		//String
 		String noLinked = (String)params.get("notLinked");
+		String outputLimitation = (String)params.get("limit");
 		
 		//required to avoid "nullpointerexceptions" when user missed these parameters 		
 		//necessary parameters
@@ -261,6 +280,16 @@ public class Reader {
 		{
 			if(!display.isEmpty())
 				this.setDisplay(display);
+		}
+		catch (NullPointerException e)
+		{
+			System.out.println("Necessary Parameters are missing. " + e.getMessage());
+		}
+		
+		try 
+		{
+			if(!outputLimitation.isEmpty())
+				this.setOutputLimitation(outputLimitation);
 		}
 		catch (NullPointerException e)
 		{
@@ -308,6 +337,7 @@ public class Reader {
 		String display = (String)params.get("display");	
 		String noLinked = (String)params.get("notLinked");
 		String trackerId = (String)params.get("trackerId");		
+		String outputLimitation = (String)params.get("limit");
 		
 		//String projectName = (String)params.get("projectName");	//String
 		String projectId = (String)params.get("projectId");		//number
@@ -354,6 +384,16 @@ public class Reader {
 		{
 			if(!noLinked.isEmpty())
 				this.setNoLinked(noLinked);
+		}
+		catch (NullPointerException e)
+		{
+			System.out.println("Necessary Parameters are missing. " + e.getMessage());
+		}
+		
+		try 
+		{
+			if(!outputLimitation.isEmpty())
+				this.setOutputLimitation(outputLimitation);
 		}
 		catch (NullPointerException e)
 		{
