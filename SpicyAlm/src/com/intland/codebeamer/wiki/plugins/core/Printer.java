@@ -10,6 +10,7 @@ import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.wiki.plugins.support.AttachmentTable;
 import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
 import com.intland.codebeamer.wiki.plugins.support.TicketResults;
+import com.intland.codebeamer.wiki.plugins.support.VelocitySupport;
 import com.intland.codebeamer.wiki.plugins.support.VelocityTable;
 
 /**Centralized Printer Class for SpicyAlm Plugin and StandAloneApplication
@@ -21,12 +22,12 @@ import com.intland.codebeamer.wiki.plugins.support.VelocityTable;
 public class Printer {
 	
 	private GlobalVariable globalVariable = null;
-	private Reader reader = null;
+	private VelocitySupport velocitySupport = null;
 	
-	public Printer (GlobalVariable globalVariable, Reader reader)
+	public Printer (GlobalVariable globalVariable, VelocitySupport velocitySupport)
 	{
 		this.globalVariable =globalVariable;
-		this.reader = reader;
+		this.velocitySupport = velocitySupport;
 	}
 	
 	/**Usable for Attachment & TrackerItem-Prints in Plugin-Style
@@ -95,7 +96,7 @@ public class Printer {
 		   			Iterator<Object> itrResult= tempResult.iterator();
 		   			while(itrResult.hasNext()) {	
 		   				TrackerItemDto tempTrackerResults = (TrackerItemDto) itrResult.next();	
-		   				if (counter < reader.getOutputLimitation())	//output limitation 
+		   				if (counter < velocitySupport.getUserLimitation())	//output limitation 
 		   				{
 		   					Integer trackerID =  tempTrackerResults.getId();
 		   					String trackerName = tempTrackerResults.getName();
@@ -114,7 +115,7 @@ public class Printer {
 			   		Iterator<Object> itrResult= tempResult.iterator();
 		   			while(itrResult.hasNext()) {	
 		   				TicketResults tempTrackerResults = (TicketResults) itrResult.next();	
-		   				if (counter < reader.getOutputLimitation())	//output limitation 
+		   				if (counter < velocitySupport.getUserLimitation())	//output limitation 
 		   				{
 		   					Integer trackerID =  tempTrackerResults.getTicket().getId();
 		   					String trackerName = tempTrackerResults.getTicket().getName();

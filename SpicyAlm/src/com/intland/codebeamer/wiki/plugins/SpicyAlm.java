@@ -18,6 +18,7 @@ import com.intland.codebeamer.wiki.plugins.core.Logic;
 import com.intland.codebeamer.wiki.plugins.core.Printer;
 import com.intland.codebeamer.wiki.plugins.core.Reader;
 import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
+import com.intland.codebeamer.wiki.plugins.support.VelocitySupport;
 
 
 
@@ -41,11 +42,12 @@ public class SpicyAlm extends AbstractCodeBeamerWikiPlugin {
 		//WikiPageDto page = getPageFromContext(context);
 		
 		//object instantiation 
-		SLReader slreader = new SLReader (user);
 		Logic logic = new Logic ();
 		GlobalVariable globalVariable = new GlobalVariable();
-		Reader readerObject = new Reader(globalVariable);
-		Printer printer = new Printer(globalVariable,readerObject);
+		VelocitySupport velocitySupport = new VelocitySupport();
+		Reader readerObject = new Reader(globalVariable, velocitySupport);
+		SLReader slreader = new SLReader (user, readerObject);
+		Printer printer = new Printer(globalVariable, velocitySupport);
 		
 		HttpServletRequest httpRequest = context.getHttpRequest();	//required for address creating
 		List<List<Object>>  results = null;
@@ -86,16 +88,22 @@ public class SpicyAlm extends AbstractCodeBeamerWikiPlugin {
 			
 			//check whether Attachments or TrackerItems have to print
 			if (readerObject.getProjectId()!=null)
+			{
 				velocityContext.put("table", printer.printAttachmentsAscii(results));	 //TODO: in Process
+				velocityContext.put("support", velocitySupport );	 
+				
+			}
 			else{
 				if (readerObject.getNoLinked())	//print just the "notLinked"-TrackerItems
 				{
 					velocityContext.put("table", printer.printTrackerItemsAscii(results,readerObject.getNoLinked()));
+					velocityContext.put("support", velocitySupport);	
 					return renderPluginTemplate("spicyAlm noArtifacts.vm", velocityContext);	
 				}
 				else	//print just the "Linked"-TrackerItems
 				{
 					velocityContext.put("table", printer.printTrackerItemsAscii(results,readerObject.getNoLinked()));
+					velocityContext.put("support", velocitySupport);	
 					return renderPluginTemplate("spicyAlm withArtifacts.vm", velocityContext);
 				}
 			}

@@ -30,3 +30,13 @@
   </tbody>
 </table>
 #wikiBoxClose()
+
+
+<output>
+	#if($support.getUserLimitation()== $support.getStandardLimitation())
+   <warning>Caution! Output standard limitation is <b>$support.getStandardLimitation()</b></warning>
+	#else 
+   <warning>Caution! Output limtation is <b>$support.getUserLimitation()</b></warning>
+	#end
+</output>
+

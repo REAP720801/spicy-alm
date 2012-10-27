@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.intland.codebeamer.wiki.plugins.support;
 
 import java.util.ArrayList;

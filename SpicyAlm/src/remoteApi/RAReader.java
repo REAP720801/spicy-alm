@@ -11,6 +11,7 @@ import java.util.List;
 import com.intland.codebeamer.remoting.RemoteApi;
 import com.intland.codebeamer.remoting.RemoteApiFactory;
 import com.intland.codebeamer.remoting.bean.ServerInfo;
+import com.intland.codebeamer.wiki.plugins.core.Reader;
 import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
 
 import com.intland.codebeamer.persistence.dto.ArtifactDto;
@@ -32,7 +33,13 @@ public class RAReader {
 	
 	private static RemoteApi api;	//Object of current connection
 	private static String token;	//contains login data
+	private Reader readerObject = null;
 	
+	public RAReader (Reader readerObject)
+	{
+		this.readerObject = readerObject;
+		
+	}
 			/**Connects to codebeamer server
 			 * @param serviceUrl String value of codebeamer server
 			 * @param login User name
@@ -131,6 +138,7 @@ public class RAReader {
 		 * @return List<ArtifactDto> List of Artifact objects
 		 */
 	    //TODO: in process runs through all projects, not project specific
+		//artifakt limiation einbauen
 		public List<ArtifactDto> readAllAttachmentsByProject (int[] projects){
 			List<ArtifactDto> attachments = new ArrayList<ArtifactDto>();
 			List<ArtifactDto> artifacts = new ArrayList <ArtifactDto>();
@@ -280,15 +288,22 @@ public class RAReader {
 				
 				if (assoc.getTo().getId() >1000)//because 1000 is not allowed as an Artifact-id nor trackerItem-id
 				{
+					ArtifactDto artifact = api.findArtifactById(token, assoc.getTo().getId());
+					
 					Object[] tempAssoc = new Object [3]; //[0]=AssociationDto object [1]=trackerItem object [2]=attachment object)
 					tempAssoc[0] = assoc;
 					tempAssoc[1] = api.findTrackerItemById(token, assoc.getFrom().getId());  //trackeritem
-					tempAssoc[2] = api.findArtifactById(token, assoc.getTo().getId());	//artifact
-					allAssoc.add(tempAssoc);
+					tempAssoc[2] = artifact; //artifact
+					
+					if (readerObject.getArtifactLimitation() && (artifact.getTypeId() == GlobalVariable.attachmentType_externalFile)  )
+						allAssoc.add(tempAssoc);	//add only Association which has am artifact of type "external file" according to user input
+					if (!readerObject.getArtifactLimitation()) //for no user artifact limitation 
+						allAssoc.add(tempAssoc);	
+					
 					//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
 				}
 			}
-			System.out.println(test);	//print out all available association ids
+			//System.out.println(test);	//print out all available association ids
 			return allAssoc;
 		}
 		

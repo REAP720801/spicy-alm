@@ -3,29 +3,24 @@
  */
 package com.intland.codebeamer.wiki.plugins;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.ecyrd.jspwiki.WikiContext;
 import com.intland.codebeamer.manager.ArtifactManager;
 import com.intland.codebeamer.manager.AssociationManager;
 import com.intland.codebeamer.manager.ProjectManager;
-import com.intland.codebeamer.manager.TrackerItemAttachmentManager;
 import com.intland.codebeamer.manager.TrackerItemManager;
 import com.intland.codebeamer.persistence.dto.ArtifactDto;
 import com.intland.codebeamer.persistence.dto.AssociationDto;
 import com.intland.codebeamer.persistence.dto.ProjectDto;
-import com.intland.codebeamer.persistence.dto.TrackerItemAttachmentDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto.Flag;
 import com.intland.codebeamer.persistence.dto.UserDto;
 import com.intland.codebeamer.persistence.dto.base.ReferableDto;
-import com.intland.codebeamer.persistence.dto.base.VersionReferenceDto;
-import com.intland.codebeamer.remoting.RemoteApi;
-import com.intland.codebeamer.remoting.RemoteApiFactory;
+import com.intland.codebeamer.wiki.plugins.core.Reader;
+import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
 
 /**Reader Class for Service Layer
  * Provides Core Business Logic of Codebeamer version 6.0.2
@@ -35,9 +30,11 @@ import com.intland.codebeamer.remoting.RemoteApiFactory;
  */
 public class SLReader {
 	private UserDto user=null;
+	private Reader readerObject = null;
 	
-	public SLReader(UserDto user) {
+	public SLReader(UserDto user, Reader readerObject) {
 		this.user = user;
+		this.readerObject = readerObject;
 	}
 	
 	/**Reads all user available Projects from CodeBeamer
@@ -62,6 +59,7 @@ public class SLReader {
 	 * @param int [] projectids, int
 	 * @return List<ArtifactDto>
 	 */
+	//TODO: artifakt limiation einbauen
 	public List<ArtifactDto> readAllAttachmentsByProject (int[] projects, int type)
 	{
 		List<ArtifactDto> attachments = new ArrayList<ArtifactDto>();
@@ -124,9 +122,7 @@ public class SLReader {
 	   	while(itrAllAssoc.hasNext()) {	//goes through AssociationDto<?,?>-List
 	   		AssociationDto<?, ?> tempAssoc = itrAllAssoc.next();
 	   		AssociationDto<?, ?> assoc = AssociationManager.getInstance().findById(user, tempAssoc.getId());	
-
-				ReferableDto origin = assoc.getFrom().getDto();
-				
+	   		
 				ReferableDto originTo = assoc.getTo().getDto();
 				ReferableDto originFrom = assoc.getFrom().getDto();
 
@@ -146,7 +142,11 @@ public class SLReader {
 				tempFinalAssoc[0] = assoc;
 				tempFinalAssoc[1] = fromItem;  //trackeritem
 				tempFinalAssoc[2] = toArtifact;	//artifact
-				allAssoc.add(tempFinalAssoc);
+				
+				if (readerObject.getArtifactLimitation() && (toArtifact.getTypeId() == GlobalVariable.attachmentType_externalFile)  )
+					allAssoc.add(tempFinalAssoc);	//add only Association which has am artifact of type "external file" according to user input
+				if (!readerObject.getArtifactLimitation()) //for no user artifact limitation 
+					allAssoc.add(tempFinalAssoc);	
 				//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
 				}
 			}

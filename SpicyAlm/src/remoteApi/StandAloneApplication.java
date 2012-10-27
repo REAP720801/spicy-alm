@@ -13,6 +13,7 @@ import com.intland.codebeamer.wiki.plugins.core.Printer;
 import com.intland.codebeamer.wiki.plugins.core.Reader;
 import com.intland.codebeamer.wiki.plugins.support.AttachmentTable;
 import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
+import com.intland.codebeamer.wiki.plugins.support.VelocitySupport;
 import com.intland.codebeamer.wiki.plugins.support.VelocityTable;
 
 
@@ -27,10 +28,12 @@ public class StandAloneApplication {
 	public static void main(String[] args) {
 
 		//object instantiation 
-		RAReader raReader =new RAReader();
+
 		GlobalVariable globalVariable = new GlobalVariable();
-		Reader readerObject = new Reader(globalVariable);
-		Printer printer = new Printer(globalVariable,readerObject );
+		VelocitySupport velocitySupport = new VelocitySupport();
+		Reader readerObject = new Reader(globalVariable, velocitySupport);
+		RAReader raReader =new RAReader(readerObject);
+		Printer printer = new Printer(globalVariable, velocitySupport);
 		Logic logic = new Logic ();
 		List<List<Object>>  results = null;
 		
@@ -47,8 +50,9 @@ public class StandAloneApplication {
 		//map.put("projectId", "2");	 //TODO: in process
 		map.put("display", "table");	//input: chart or table
 		map.put("trackerId", "5,6,7");	    //Pattern: specific values as int,int,int,... or for a full search use: "" -->alle
-		map.put("notLinked", "true");
-		map.put("limit", "2");
+		map.put("notLinked", "false");
+		map.put("outputLimit", "100");
+		map.put("artifactLimit", "file");
 		
 		//read user parameters
 		readerObject.readParameterSAloneApp(map);

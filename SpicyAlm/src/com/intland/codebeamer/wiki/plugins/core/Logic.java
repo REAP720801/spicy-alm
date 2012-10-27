@@ -22,7 +22,7 @@ public class Logic {
 	 * @param List<int[]> Expecting a List filled with an Array (Pattern: [0]=assoc-object [1]=trackerItem-object [2]=attachment-object)
 	 * @return List<List<Object>>  List of Object-List this has following pattern [0] List<Object> (positive linked Attachments) [1] List<Object> (negative linked Attachments)
 	 */ 
-	//TODO: in Process: Matching has some errors
+	//TODO: in Process: Matching has some errors and feature is not required currently
 	public List<List<Object>> checkAttachments (List <TrackerItemDto> allTrackerItems, List <ArtifactDto> allAttachments, List<Object> AllAssociations )
 	{
 		List<Object> positiveAttachments = new ArrayList<Object>();	//list for linked attachements with trackeritems

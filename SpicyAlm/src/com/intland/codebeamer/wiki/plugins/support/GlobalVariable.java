@@ -38,5 +38,6 @@ public class GlobalVariable {
 		this.url = url;
 	}
 	
-	public static int limitation = 100; //standard value
+	public static int standarLimitation = 100; //standard value
+	
 }

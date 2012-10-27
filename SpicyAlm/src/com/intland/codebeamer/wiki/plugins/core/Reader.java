@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.lang.ArrayUtils;
 
 import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
+import com.intland.codebeamer.wiki.plugins.support.VelocitySupport;
 
 
 /**Centralized Reader Class for SpicyAlm Plugin and StandAloneApplication
@@ -26,17 +27,16 @@ public class Reader {
 	private String user ="noValue";
 	private String password ="noValue";
 	private int outputLimitation =100;	//standard value for output
-	
+	private boolean artifactLimation = false;
+
 	private Boolean notLinked = false;
 	private Boolean tracker = false;
 
-	private Boolean positive = false;
-	private Boolean negative = false;
-	private Boolean all = false;
 	
 	Reader readerObject = null;
 	
 	GlobalVariable globalVariable = null;
+	VelocitySupport velocitySupport = null;
 	
 	/**Returns Instance of GlobalVariable object
 	 * useful for "url" which is used in Printer-class
@@ -46,9 +46,15 @@ public class Reader {
 		return this.globalVariable;
 	}
 	
-	public Reader (GlobalVariable globalVariable)
+	public VelocitySupport getVelocitySupport() {
+		return this.velocitySupport;
+	}
+	
+	
+	public Reader (GlobalVariable globalVariable, VelocitySupport velocitySupport)
 	{
 		this.globalVariable = globalVariable;
+		this.velocitySupport = velocitySupport;
 	}
 	
 	/**Get number for output limitation
@@ -63,14 +69,38 @@ public class Reader {
 	 * @param outputLimitation String value 
 	 */
 	public void setOutputLimitation(String outputLimitation) {
-		int temp = GlobalVariable.limitation;
+		int temp = GlobalVariable.standarLimitation;
+		
 		try {
 			 temp = Integer.parseInt(outputLimitation);
 		} 
 			catch (NumberFormatException e) {
 				System.out.println("i ist keine Zahl. " + e.getMessage());
 			}
+		velocitySupport.setStandardLimitation(GlobalVariable.standarLimitation);
+		velocitySupport.setUserLimitation(temp);
 		this.outputLimitation = temp;
+	}
+	
+	/**Get boolean value of artifact limitation
+	 * @return boolean
+	 */
+	public boolean getArtifactLimitation() {
+		return artifactLimation;
+	}
+
+	/**Set user input of parameter "artifactLimit" to boolean variable
+	 * Method has to be modified to various parameter if required with additionally variable type change
+	 * @param artifactLimation String value
+	 */
+	public void setArtifactLimitation(String artifactLimation) {	
+		//System.out.println (artifactLimation );
+		if (artifactLimation.contains("file"))
+		{
+			this.artifactLimation = true;
+		}
+		else
+			this.artifactLimation = false;
 	}
 	
 	public String getUrl() {
@@ -202,49 +232,6 @@ public class Reader {
 		{
 			this.tracker = true;
 		}
-
-	}
-
-	public Boolean getPositve() {
-		return positive;
-	}
-
-	/**Standardvalue is false
-	 * @param positive
-	 */
-	public void setPositve(String positive) {
-		if (positive.indexOf("true")>-1)
-		{
-			this.positive = true;
-		}
-	}
-
-	public Boolean getNegative() {
-		return negative;
-	}
-
-	/**Standardvalue is false
-	 * @param negative
-	 */
-	public void setNegative(String negative) {
-		if (negative.indexOf("true")>-1)
-		{
-			this.negative = true;
-		}
-	}
-
-	public Boolean getAll() {
-		return all;
-	}
-
-	/**Standardvalue is false
-	 * @param all
-	 */
-	public void setAll(String all) {
-		if (all.indexOf("true")>-1)
-		{
-			this.all = true;
-		}
 	}
 
 	/**Checks if String value is numeric
@@ -272,7 +259,8 @@ public class Reader {
 		String projectId = (String)params.get("projectId");		//number
 		String trackerId = (String)params.get("trackerId");		//String
 		String noLinked = (String)params.get("notLinked");
-		String outputLimitation = (String)params.get("limit");
+		String outputLimitation = (String)params.get("outputLimit");
+		String artifactLimitation = (String)params.get("artifactLimit");
 		
 		//required to avoid "nullpointerexceptions" when user missed these parameters 		
 		//necessary parameters
@@ -288,7 +276,16 @@ public class Reader {
 		
 		try 
 		{
-			if(!outputLimitation.isEmpty())
+			if(!artifactLimitation.isEmpty())
+				this.setArtifactLimitation(artifactLimitation);
+		}
+		catch (NullPointerException e)
+		{
+			System.out.println("Necessary Parameters are missing. " + e.getMessage());
+		}
+		
+		try 
+		{
 				this.setOutputLimitation(outputLimitation);
 		}
 		catch (NullPointerException e)
@@ -337,7 +334,8 @@ public class Reader {
 		String display = (String)params.get("display");	
 		String noLinked = (String)params.get("notLinked");
 		String trackerId = (String)params.get("trackerId");		
-		String outputLimitation = (String)params.get("limit");
+		String outputLimitation = (String)params.get("outputLimit");
+		String artifactLimitation = (String)params.get("artifactLimit");
 		
 		//String projectName = (String)params.get("projectName");	//String
 		String projectId = (String)params.get("projectId");		//number
@@ -394,6 +392,16 @@ public class Reader {
 		{
 			if(!outputLimitation.isEmpty())
 				this.setOutputLimitation(outputLimitation);
+		}
+		catch (NullPointerException e)
+		{
+			System.out.println("Necessary Parameters are missing. " + e.getMessage());
+		}
+		
+		try 
+		{
+			if(!artifactLimitation.isEmpty())
+				this.setArtifactLimitation(artifactLimitation);
 		}
 		catch (NullPointerException e)
 		{
