@@ -12,15 +12,18 @@ import com.intland.codebeamer.manager.ArtifactManager;
 import com.intland.codebeamer.manager.AssociationManager;
 import com.intland.codebeamer.manager.ProjectManager;
 import com.intland.codebeamer.manager.TrackerItemManager;
+import com.intland.codebeamer.manager.WikiPageManager;
 import com.intland.codebeamer.persistence.dto.ArtifactDto;
 import com.intland.codebeamer.persistence.dto.AssociationDto;
 import com.intland.codebeamer.persistence.dto.ProjectDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto.Flag;
 import com.intland.codebeamer.persistence.dto.UserDto;
+import com.intland.codebeamer.persistence.dto.WikiPageDto;
 import com.intland.codebeamer.persistence.dto.base.ReferableDto;
 import com.intland.codebeamer.wiki.plugins.core.Reader;
 import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
+
 
 /**Reader Class for Service Layer
  * Provides Core Business Logic of Codebeamer version 6.0.2
@@ -111,13 +114,12 @@ public class SLReader {
 	 * @return  List<Object> List of Object[] pattern: [0]=assoc-object [1]=trackerItem-object [2]=attachment-object)
 	 */
 	//TODO: not always TrackerItemDto object
-	public List<Object> readAllAssociations()	//from current project
+	public List<Object> readAllAssociationsTracker()	//from current project
 	{
 		//all Associations, unabhängig welcher Tracker
 		List<AssociationDto<?,?>> tempAllAssoc = AssociationManager.getInstance().findAll(user);
 		List<Object> allAssoc = new ArrayList<Object>();
 		
-		String test = "";
 		Iterator<AssociationDto<?, ?>> itrAllAssoc = tempAllAssoc.iterator();
 	   	while(itrAllAssoc.hasNext()) {	//goes through AssociationDto<?,?>-List
 	   		AssociationDto<?, ?> tempAssoc = itrAllAssoc.next();
@@ -127,14 +129,20 @@ public class SLReader {
 				ReferableDto originFrom = assoc.getFrom().getDto();
 
 				ArtifactDto toArtifact =null;
-				if (originTo instanceof ArtifactDto) {
-					 toArtifact = (ArtifactDto) originTo;
-				}
-					
 				TrackerItemDto fromItem =null;
-				if (originFrom instanceof TrackerItemDto) {
-					fromItem = (TrackerItemDto) originFrom;
+				
+				if (originTo instanceof TrackerItemDto) {
+					fromItem = (TrackerItemDto) originTo;
+					toArtifact = (ArtifactDto) originFrom;
+					 
 				}
+
+				else if (originFrom instanceof TrackerItemDto) {
+						fromItem = (TrackerItemDto) originFrom;
+						toArtifact =(ArtifactDto) originTo;
+				 }	
+				
+				
 				
 				if (toArtifact!=null && fromItem !=null)
 				{
@@ -153,4 +161,78 @@ public class SLReader {
 		return allAssoc;
 	} 
 
+	
+	/**Get wikiPage out of Context
+	 * Cast String value to int and find one WikiPageDto.
+	 * @param tempWikiID String value contains id
+	 * @return List<WikiPageDto> Returns List of WikiPageDto items
+	 */
+	public List<WikiPageDto> readWikiPage (int wikiID)
+	{
+		
+		WikiPageDto wikiPage = WikiPageManager.getInstance().findById(user, wikiID);
+		List <WikiPageDto> items= new ArrayList<WikiPageDto>();
+		items.add(wikiPage);
+		return items;
+	}
+	
+	/**Provides all available associations (with linked WikiPages and Artifact)  for current user 
+	 * @return List<Object> List includes Arrays of Objects, Array positions [0]=AssociationDto Object [1]=WikiPageDto Object [2]=ArtifactDto Object
+	  pre-check if associations are linked to wikpages, artifact's limitation parameter only for "file" (external attachments)
+	 */
+	public List<Object> readAllAssociationsWiki()	
+	{
+		//all Associations
+		List<AssociationDto<?,?>> tempAllAssoc = AssociationManager.getInstance().findAll(user);
+		List<Object> allAssoc = new ArrayList<Object>();
+		
+		Iterator<AssociationDto<?, ?>> itrAllAssoc = tempAllAssoc.iterator();
+	   	while(itrAllAssoc.hasNext()) {	//goes through AssociationDto<?,?>-List
+	   		AssociationDto<?, ?> tempSingleAssoc = itrAllAssoc.next();
+	   		AssociationDto<?, ?> assoc = AssociationManager.getInstance().findById(user, tempSingleAssoc.getId());	
+	   				
+			ReferableDto originFrom = assoc.getFrom().getDto();
+			ReferableDto originTo = assoc.getTo().getDto();
+
+			WikiPageDto wikiPage =null;
+			ArtifactDto artifact = null;
+			
+			if (originFrom instanceof WikiPageDto) {
+				wikiPage = (WikiPageDto) originFrom;
+				artifact = (ArtifactDto)originTo;
+			}
+			
+			if (originTo instanceof WikiPageDto) {
+				wikiPage = (WikiPageDto) originTo;
+				artifact = (ArtifactDto) originFrom;
+				
+				if (artifact instanceof WikiPageDto)
+				{
+					//change objects, one use case could be that two wikipages are linked to each other and this part corrects the order
+					WikiPageDto temp = wikiPage;
+					wikiPage = (WikiPageDto)artifact;
+					artifact = temp;
+				}	
+			}
+				
+				if (wikiPage !=null){
+				//System.out.println("READ: " + wikiPage.getName() + " "  + wikiPage.getId());
+				Object[] tempAssoc = new Object [3]; //[0]=AssociationDto object [1]=trackerItem object [2]=attachment object)
+				tempAssoc[0] = assoc;
+				tempAssoc[1] = wikiPage;  //wikiPage
+				tempAssoc[2] = artifact; //artifact
+								
+				//limitation check "file" 
+				if (readerObject.getArtifactLimitation() && (artifact.getTypeId() == GlobalVariable.attachmentType_externalFile)  )
+					allAssoc.add(tempAssoc);	//add only Association which has an artifact of type "external file" according to user input
+				if (!readerObject.getArtifactLimitation()) //for no user artifact limitation 
+					allAssoc.add(tempAssoc);	
+			
+				
+				//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
+				}
+			}
+		
+		return allAssoc;
+	}
 }

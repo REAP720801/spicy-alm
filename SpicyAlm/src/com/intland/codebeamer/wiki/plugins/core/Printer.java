@@ -7,11 +7,13 @@ import java.util.List;
 
 import com.intland.codebeamer.persistence.dto.ArtifactDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
+import com.intland.codebeamer.persistence.dto.WikiPageDto;
 import com.intland.codebeamer.wiki.plugins.support.AttachmentTable;
 import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
 import com.intland.codebeamer.wiki.plugins.support.TicketResults;
 import com.intland.codebeamer.wiki.plugins.support.VelocitySupport;
 import com.intland.codebeamer.wiki.plugins.support.VelocityTable;
+import com.intland.codebeamer.wiki.plugins.support.WikiResults;
 
 /**Centralized Printer Class for SpicyAlm Plugin and StandAloneApplication
  * Provides various methods for two output templates (velocity and chart plugin).
@@ -117,9 +119,9 @@ public class Printer {
 		   				TicketResults tempTrackerResults = (TicketResults) itrResult.next();	
 		   				if (counter < velocitySupport.getUserLimitation())	//output limitation 
 		   				{
-		   					Integer trackerID =  tempTrackerResults.getTicket().getId();
-		   					String trackerName = tempTrackerResults.getTicket().getName();
-		   					String trackerUrl= buildUrl ( tempTrackerResults.getTicket().getUrlLink()) ; 
+		   					Integer trackerID =  tempTrackerResults.getObject().getId();
+		   					String trackerName = tempTrackerResults.getObject().getName();
+		   					String trackerUrl= buildUrl ( tempTrackerResults.getObject().getUrlLink()) ; 
 		   					
 		   					List<ArtifactDto> attachments=  tempTrackerResults.getArtifacts();
 		   					List<AttachmentTable> artifact = convertArtifact(attachments);	//convert Attachments to velocity template usable pattern
@@ -131,6 +133,47 @@ public class Printer {
 		   				}
 		   			}
 		   		}
+		   	
+		   	return list;
+		}
+		
+		/**Provides output in table structure for velocity template
+		 * Similar to printTrackerItems()
+		 * @param results List of List with position [0] List<Object> (positive linked WikiPages) [1] List<Object> (negative linked WikiPages)
+		 * @return List <VelocityTable> (getTicketID, getTicketLink, getAttachmentLink)
+		 * Change "limit" paramater, otherwise standard value for ouptut limitation is 100 
+		 * Boolean "notLinked" is not implemented, does not make sense in this context
+		 */
+		public List printWikPagesAscii (List<List<Object>> results, boolean notLinked)
+		{	int counter =0; 
+			List<VelocityTable> list = new ArrayList<VelocityTable>();
+			
+			Iterator<List<Object>> itrResults= results.iterator();
+		   	itrResults.hasNext(); 
+		   	
+		   		List<Object> tempResult = itrResults.next();
+		   		
+		   		//print positive WikiPages linked to Attachments 
+		   		
+			   		Iterator<Object> itrResult= tempResult.iterator();
+		   			while(itrResult.hasNext()) {	
+		   				WikiResults tempWikiResults = (WikiResults) itrResult.next();	
+		   				if (counter < velocitySupport.getUserLimitation())	//output limitation 
+		   				{
+		   					Integer ID =  tempWikiResults.getObject().getId();
+		   					String Name = tempWikiResults.getObject().getName();
+		   					String Url= buildUrl ( tempWikiResults.getObject().getUrlLink()) ; 
+		   					
+		   					List<ArtifactDto> attachments=  tempWikiResults.getArtifacts();
+		   					List<AttachmentTable> artifact = convertArtifact(attachments);	//convert Attachments to velocity template usable pattern
+		   		
+		   					list.add(new VelocityTable(ID, Name,  Url , artifact));	   					
+		   				
+		   				}
+		   				counter++;
+		   				}
+		   			
+		   		
 		   	
 		   	return list;
 		}

@@ -3,18 +3,18 @@ package com.intland.codebeamer.wiki.plugins.support;
 import java.util.List;
 
 /**Class for VeloCity template output
- * Provides various entities (TicketID, TicketLink, TicketName, List of Attachments) which were  
+ * Provides various entities (ID, Link, Name, List of Attachments) which were  
  * calculated during entire Process
- * Entities can be positive linked TrackerItems with Attachments or not linked TrackerItems
+ * Entities can be positive linked TrackerItems/WikiPages with Attachments or not linked TrackerItems/WikiPages
  * @author Alexander Börsch
  * 
  */
 
 public class VelocityTable {
 	
-	private int ticketID;
-    private String ticketLink;
-    private String ticketName;
+	private int ID;
+    private String Link;
+    private String Name;
     private List<AttachmentTable> attachment;
 
 	/**Gets List of AttachmentTable Objects
@@ -30,13 +30,13 @@ public class VelocityTable {
 	}
 
 
-	public String getTicketName() {
-		return ticketName;
+	public String getName() {
+		return Name;
 	}
 
 
-	public void setTicketName(String ticketName) {
-		this.ticketName = ticketName;
+	public void setName(String Name) {
+		this.Name = Name;
 	}
 
 
@@ -46,33 +46,33 @@ public class VelocityTable {
 	 * @param ticketLink String 
 	 * @param attachment List<AttachmentTable> List of AttachmentTable objects
 	 */
-	public VelocityTable (int ticketID, String ticketName, String ticketLink, List<AttachmentTable> attachment ) 
+	public VelocityTable (int ID, String Name, String Link, List<AttachmentTable> attachment ) 
 	{
-		setTicketID (ticketID);
-		setTicketLink(ticketLink);	
-		setTicketName(ticketName);
+		setID (ID);
+		setLink(Link);	
+		setName(Name);
 		setAttachment(attachment);
 	}
 
 
-	public String getTicketID() {
-		return Integer.toString(ticketID) ;
+	public String getID() {
+		return Integer.toString(ID) ;
 		//Cast integer to string because Velocity template cant handle int-values
 	}
 
 
-	public void setTicketID(int ticketID) {
-		this.ticketID = ticketID;
+	public void setID(int ID) {
+		this.ID = ID;
 	}
 
 
-	public String getTicketLink() {
-		return ticketLink;
+	public String getLink() {
+		return Link;
 	}
 
 
-	public void setTicketLink(String ticketLink) {
-		this.ticketLink = ticketLink;
+	public void setLink(String ticketLink) {
+		this.Link = ticketLink;
 	}
 
 

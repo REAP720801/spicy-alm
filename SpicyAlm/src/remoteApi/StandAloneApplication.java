@@ -1,6 +1,7 @@
 package remoteApi;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
+import com.intland.codebeamer.persistence.dto.WikiPageDto;
 import com.intland.codebeamer.wiki.plugins.core.Logic;
 import com.intland.codebeamer.wiki.plugins.core.Printer;
 import com.intland.codebeamer.wiki.plugins.core.Reader;
@@ -53,6 +55,7 @@ public class StandAloneApplication {
 		map.put("notLinked", "false");
 		map.put("outputLimit", "100");
 		map.put("artifactLimit", "file");
+		map.put("wikiContext", "false");	
 		
 		//read user parameters
 		readerObject.readParameterSAloneApp(map);
@@ -63,30 +66,53 @@ public class StandAloneApplication {
 	
 	//**********************reading*************
 
-	//read TrackerItems
-	List<TrackerItemDto> allTrackerItems = raReader.readAllTrackerItems(readerObject.getTrackerID()); 
-	//System.out.println(allTrackerItems.size());
-
-	//find all Associations in this specific project
-	List<Object> allAssoc = raReader.readAllAssociations();	
+	List<WikiPageDto> wiki = null;
+	List<TrackerItemDto> allTrackerItems =null;
+	List<Object> allAssoc = null;
+	
+	if (readerObject.getWikiContext())	//check if user chooses wikicontext or tracker 
+	{
+		//read WikiPage
+		wiki = raReader.readWikiPage("1039");	//TODO: statisch
+		
+		//find all Associations related to all wikipages in this specific project
+		allAssoc = raReader.readAllAssociationsWiki();	
+	}
+	else
+	{
+		//read TrackerItems
+		allTrackerItems = raReader.readAllTrackerItems(readerObject.getTrackerID()); 
+	
+		//find all Associations in this specific project
+	    allAssoc = raReader.readAllAssociationsTracker();	
+	}
 	
 	//**********************logic*************
-	//check whether Attachments or TrackerItems have to check
-	if (readerObject.getProjectId()!=null)
+	
+	//if user chooses wikicontext, checks all artifacts linked to WikiPage
+	if (readerObject.getWikiContext())	
 	{
+		results = logic.checkWikiPages(wiki, null, allAssoc);
+		System.out.println("A");
+	}
+	//check whether Attachments or TrackerItems have to check
+	else if (readerObject.getProjectId()!=null)
+	{
+		System.out.println("3");
 		//find all Attachments from project
 		//List<ArtifactDto>  allAttachments = raReader.readAllAttachmentsByProject(projects);	 //TODO: in process
 		
 		//check if every Attachment has minimum one association
 	   // results = logic.checkAttachments(null, allAttachments, allAssoc);		//TODO: in process
 	}
-	else	//check TrackerItem
+	else	//checks TrackerItem
 	{
 		//check if every TrackerItem has minimum one association
 		results = logic.checkTrackerItems(allTrackerItems, null, allAssoc);
 	}
-				
 	//**********************Print*************
+	
+	//print "chart" 
 	if (readerObject.getDisplay() == "chart")
 	{
 		if (readerObject.getProjectId()!=null)
@@ -94,12 +120,21 @@ public class StandAloneApplication {
 		else
 			System.out.println (printer.printPluginPattern(results, false)); //Tracker specific output
 	}
+	//print "table"
 	else
 	{
+		List<VelocityTable> table = null;
+		
+		//print wikicontext 
+		if (readerObject.getWikiContext())
+		{
+			table = printer.printWikPagesAscii(results, false);	
+		}
+		
 		//check whether Attachments or TrackerItems have to print
-		if (readerObject.getProjectId()!=null){
-		//System.out.println(printer.printAttachmentsAscii(results));
-			List<VelocityTable> table = printer.printAttachmentsAscii(results);
+		else if (readerObject.getProjectId()!=null)
+		{
+			table = printer.printAttachmentsAscii(results);
 		}
 		else
 		{
@@ -107,13 +142,13 @@ public class StandAloneApplication {
 			   	f.hasNext(); 	//runs just once, but can goes twice: [0]=posTrackerItems(Class TicketResults) [1]=negTrackerItems (Class TrackerItemsDto)
 			   		List<Object> a = f.next();
 			
-			List<VelocityTable> table = printer.printTrackerItemsAscii(results, readerObject.getNoLinked());
-			
+			table = printer.printTrackerItemsAscii(results, readerObject.getNoLinked());
+		}	
 			//Print simulation
 			Iterator<VelocityTable> itrResults= table.iterator();
 		   	while(itrResults.hasNext()) {	//runs just once, later //VelocityTable-Object 
 		   		VelocityTable tempResult =  itrResults.next();
-		   			System.out.println (tempResult.getTicketID() + " "+ tempResult.getTicketName()+ " " + tempResult.getTicketLink()); 
+		   			System.out.println (tempResult.getID() + " "+ tempResult.getName()+ " " + tempResult.getLink()); 
 		   			
 		   			List<AttachmentTable> attResults = tempResult.getAttachment();
 		   			if (!readerObject.getNoLinked()) //needs it, otherwise nullpointerException of calling not existing Artifacts
@@ -125,9 +160,8 @@ public class StandAloneApplication {
 					   		System.out.println("--" + tempAttResult.getName() + " " + tempAttResult.getUrl() );
 					   	}
 		   			}
-		   	}
-		   	
 		}
+		
 	}
 				
 			}

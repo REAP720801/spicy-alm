@@ -65,7 +65,7 @@ public class TestPrinter {
 		int counter=0;
 	   	while(itrResults.hasNext()) {	//runs just once, later //VelocityTable-Object 
 	   		VelocityTable tempResult =  itrResults.next();
-	   			System.out.println (tempResult.getTicketID() + " " + tempResult.getTicketLink()); 
+	   			System.out.println (tempResult.getID() + " " + tempResult.getLink()); 
 	   			
 	   			List<AttachmentTable> attResults = tempResult.getAttachment();
 	   			counter++;

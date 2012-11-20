@@ -1,5 +1,5 @@
 #wikiBoxOpen(${table})
-#wikiBoxTitle("Overview of not linked trackeritems")
+#wikiBoxTitle("Overview of not linked Items")
 <table>
     	<tbody>
 <tr>
@@ -9,8 +9,8 @@
 <tr>
           #foreach($object in $table)
            #trOpen
- <td class="compact" style="white-space"><span class="subtext">#esc($object.getTicketID())</td>
-        	<td><a href="$object.getTicketLink()">$object.getTicketName()</a></td>
+ <td class="compact" style="white-space"><span class="subtext">#esc($object.getID())</td>
+        	<td><a href="$object.getLink()">$object.getName()</a></td>
         	 #trClose
 	      #end
 </tr>

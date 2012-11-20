@@ -14,11 +14,13 @@ import com.intland.codebeamer.remoting.bean.ServerInfo;
 import com.intland.codebeamer.wiki.plugins.core.Reader;
 import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
 
+import com.intland.codebeamer.manager.WikiPageManager;
 import com.intland.codebeamer.persistence.dto.ArtifactDto;
 import com.intland.codebeamer.persistence.dto.AssociationDto;
 import com.intland.codebeamer.persistence.dto.ProjectDto;
 import com.intland.codebeamer.persistence.dto.TrackerDto;
 import com.intland.codebeamer.persistence.dto.UserDto;
+import com.intland.codebeamer.persistence.dto.WikiPageDto;
 
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 
@@ -273,8 +275,9 @@ public class RAReader {
 	
 		/**Provides all available associations (with linked TrackerItem and Artifact)  for current user 
 		 * @return List<Object> List includes Arrays of Objects, Array positions [0]=AssociationDto Object [1]=TrackerItemDto Object [2]=ArtifactDto Object
+	 	   pre-check if associations are linked to trackeritem, artifact's limitation parameter only for "file" (external attachments)
 		 */
-		public List<Object> readAllAssociations()	
+		public List<Object> readAllAssociationsTracker()	
 		{
 			//all Associations
 			AssociationDto[] tempAllAssoc = api.findAllAssociations(token);
@@ -285,25 +288,106 @@ public class RAReader {
 				AssociationDto assoc =tempAllAssoc[s];	
 				test = test + " "+ Integer.toString(assoc.getId());
 				
+				//System.out.println (assoc.getId() + " " + assoc.getFrom().getId() + " " + assoc.getTo().getId());
 				
 				if (assoc.getTo().getId() >1000)//because 1000 is not allowed as an Artifact-id nor trackerItem-id
 				{
-					ArtifactDto artifact = api.findArtifactById(token, assoc.getTo().getId());
+					TrackerItemDto trackerItem = null;
+					ArtifactDto artifact = null;
 					
+					//pre-check 
+					Object tempObject = api.findTrackerItemById(token, assoc.getFrom().getId());  //trackeritem
+					if (tempObject instanceof TrackerItemDto)
+					{
+						trackerItem = (TrackerItemDto) tempObject;
+					    artifact = api.findArtifactById(token, assoc.getTo().getId());
+					}
+					
+					//pre-check 
+					tempObject = api.findTrackerItemById(token, assoc.getTo().getId());  //trackeritem
+					if (tempObject instanceof TrackerItemDto) {
+						trackerItem = (TrackerItemDto) tempObject;
+						artifact = api.findArtifactById(token, assoc.getFrom().getId());
+					}
+					
+					if (trackerItem !=null && artifact!=null )
+					{						
 					Object[] tempAssoc = new Object [3]; //[0]=AssociationDto object [1]=trackerItem object [2]=attachment object)
 					tempAssoc[0] = assoc;
-					tempAssoc[1] = api.findTrackerItemById(token, assoc.getFrom().getId());  //trackeritem
+					tempAssoc[1] = trackerItem; //trackeritem
 					tempAssoc[2] = artifact; //artifact
 					
+					//limitation check "file"
 					if (readerObject.getArtifactLimitation() && (artifact.getTypeId() == GlobalVariable.attachmentType_externalFile)  )
 						allAssoc.add(tempAssoc);	//add only Association which has am artifact of type "external file" according to user input
 					if (!readerObject.getArtifactLimitation()) //for no user artifact limitation 
 						allAssoc.add(tempAssoc);	
 					
 					//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
+					}
 				}
 			}
 			//System.out.println(test);	//print out all available association ids
+			return allAssoc;
+		}
+		
+		/**Provides all available associations (with linked WikiPages and Artifact)  for current user 
+		 * @return List<Object> List includes Arrays of Objects, Array positions [0]=AssociationDto Object [1]=WikiPageDto Object [2]=ArtifactDto Object
+		  pre-check if associations are linked to wikpages, artifact's limitation parameter only for "file" (external attachments)
+		 */
+		public List<Object> readAllAssociationsWiki()	
+		{
+			//all Associations
+			AssociationDto[] tempAllAssoc = api.findAllAssociations(token);
+			List <Object> allAssoc = new ArrayList<Object>();
+
+			for (int s = 0; s< tempAllAssoc.length;s++) 
+			{
+				AssociationDto assoc =tempAllAssoc[s];	
+			{
+					WikiPageDto wikiPage =null;
+					ArtifactDto artifact = null;
+					
+					Object tempObject = api.findWikiPageById(token, assoc.getFrom().getId());  //wikiPage
+					if (tempObject instanceof WikiPageDto) {
+						wikiPage = (WikiPageDto) tempObject;
+						artifact = api.findArtifactById(token, assoc.getTo().getId());
+						//System.out.println("READ: " + wikiPage.getName() + " "  + wikiPage.getId());
+					}
+					
+					tempObject = api.findWikiPageById(token, assoc.getTo().getId());  //wikiPage
+					if (tempObject instanceof WikiPageDto) {
+						wikiPage = (WikiPageDto) tempObject;
+						artifact = api.findArtifactById(token, assoc.getFrom().getId());
+						
+						if (artifact instanceof WikiPageDto)
+						{
+							//change objects, one use case could be that two wikipages are linked to each other and this part corrects the order
+							WikiPageDto temp = wikiPage;
+							wikiPage = (WikiPageDto)artifact;
+							artifact = temp;
+						}	
+					}
+					
+					
+					if (wikiPage !=null){
+					//System.out.println("READ: " + wikiPage.getName() + " "  + wikiPage.getId());
+					Object[] tempAssoc = new Object [3]; //[0]=AssociationDto object [1]=trackerItem object [2]=attachment object)
+					tempAssoc[0] = assoc;
+					tempAssoc[1] = wikiPage;  //wikiPage
+					tempAssoc[2] = artifact; //artifact
+									
+					//limitation check "file" 
+					if (readerObject.getArtifactLimitation() && (artifact.getTypeId() == GlobalVariable.attachmentType_externalFile)  )
+						allAssoc.add(tempAssoc);	//add only Association which has an artifact of type "external file" according to user input
+					if (!readerObject.getArtifactLimitation()) //for no user artifact limitation 
+						allAssoc.add(tempAssoc);	
+				
+					
+					//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
+					}
+				}
+			}
 			return allAssoc;
 		}
 		
@@ -319,6 +403,18 @@ public class RAReader {
 			return tempArray;
 		}
 
-
-
+		/**Get wikiPage out of Context
+		 * Cast String value to int and find one WikiPageDto.
+		 * @param tempWikiID String value contains id
+		 * @return List<WikiPageDto> Returns List of WikiPageDto items
+		 */
+		public List<WikiPageDto> readWikiPage (String tempWikiID)
+		{
+			int wikiID= Integer.parseInt(tempWikiID);
+			
+			WikiPageDto wikiPage = api.findWikiPageById(token, wikiID);
+			List <WikiPageDto> items= new ArrayList<WikiPageDto>();
+			items.add(wikiPage);
+			return items;
+		}
 }

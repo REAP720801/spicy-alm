@@ -4,44 +4,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.intland.codebeamer.persistence.dto.ArtifactDto;
-import com.intland.codebeamer.persistence.dto.TrackerItemDto;
+import com.intland.codebeamer.persistence.dto.WikiPageDto;
 
-/**Class combines one TrackerItemDto (Ticket) Object to multiple various Artifacts
+/**Class combines one WikiPageDto (wiki) Object to multiple various Artifacts
  * Required for outpout in VeloCity style
+ * Similar to "TicketResults" class
  * @author Alexander Börsch
  *
  */
-public class TicketResults {
+public class WikiResults {
 
-	private TrackerItemDto ticket;
+	private WikiPageDto wiki;
 	private List <ArtifactDto> artifacts;
 	
-	/**Constructor needs TrackerItemDto
-	 * @param ticket Input TrackerItemDto object
+	/**Constructor needs WikiPageDto
+	 * @param ticket Input WikiPageDto object
 	 * It's possible to add multiple Artifacts to various times
 	 */
-	public TicketResults (TrackerItemDto ticket)
+	public WikiResults (WikiPageDto wiki)
 	{
-		setObject(ticket);
+		setObject(wiki);
 		
 		if (this.artifacts ==null)
 			this.artifacts = new ArrayList <ArtifactDto>();		
 	}
 	
-	/**Returns TrackerItemDto object
-	 * @return TrackerItemDto TrackerItemDto Object
+	/**Returns WikiPageDto object
+	 * @return WikiPageDto WikiPageDto Object
 	 */
-	public TrackerItemDto getObject() {
-		return ticket;
+	public WikiPageDto getObject() {
+		return wiki;
 	}
 	
-	/**Checks if TrackerItemDto-Object already exists in that case no value-change is possible any more
+	/**Checks if WikiPageDto-Object already exists in that case no value-change is possible any more
 	 * need it because multiple accesses to same object for artifact-adding
-	 * @param ticket Input TrackerItemDto Object
+	 * @param object Input WikiPageDto Object
 	 */
-	public void setObject(TrackerItemDto ticket) {
-		if (this.ticket == null)
-			this.ticket = ticket;
+	public void setObject(WikiPageDto object) {
+		if (this.wiki == null)
+			this.wiki = object;
 	}
 	/**Returns List of Artifact objects
 	 * @return List<ArtifactDto> List of Artifact objects

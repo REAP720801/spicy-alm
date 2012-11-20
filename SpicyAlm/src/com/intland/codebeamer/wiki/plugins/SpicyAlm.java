@@ -1,5 +1,6 @@
 package com.intland.codebeamer.wiki.plugins;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,12 +14,14 @@ import com.ecyrd.jspwiki.WikiContext;
 
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.persistence.dto.UserDto;
+import com.intland.codebeamer.persistence.dto.WikiPageDto;
 import com.intland.codebeamer.wiki.plugins.base.AbstractCodeBeamerWikiPlugin;
 import com.intland.codebeamer.wiki.plugins.core.Logic;
 import com.intland.codebeamer.wiki.plugins.core.Printer;
 import com.intland.codebeamer.wiki.plugins.core.Reader;
 import com.intland.codebeamer.wiki.plugins.support.GlobalVariable;
 import com.intland.codebeamer.wiki.plugins.support.VelocitySupport;
+import com.intland.codebeamer.wiki.plugins.support.VelocityTable;
 
 
 
@@ -52,6 +55,9 @@ public class SpicyAlm extends AbstractCodeBeamerWikiPlugin {
 		HttpServletRequest httpRequest = context.getHttpRequest();	//required for address creating
 		List<List<Object>>  results = null;
 		
+		//wikiPage id from context 
+		readerObject.setWikiID(context.getName());
+		
 		//configuration
 		globalVariable.setUrl("http://"+httpRequest.getServerName() + ":" + httpRequest.getServerPort() + "/cb" ); //set Address
 		
@@ -59,19 +65,41 @@ public class SpicyAlm extends AbstractCodeBeamerWikiPlugin {
 		readerObject.readParameter(params);	
 
 		//**********************reading*************
-		//read TrackerItems
-		List<TrackerItemDto> allTrackerItems = slreader.readAllTrackerItems (readerObject.getTrackerID(), flag); 
-
-		//find all Associations in this specific project
-		List<Object> allAssoc = slreader.readAllAssociations();	//TODO: still Dummy values
 		
-		//check if every TrackerItem has minimum one association
-	    results = logic.checkTrackerItems(allTrackerItems, null, allAssoc);
-
-		//**********************logic*************
-		//check if every TrackerItem has minimum one association
-		results = logic.checkTrackerItems(allTrackerItems, null, allAssoc);
+		List<WikiPageDto> wiki = null;
+		List<TrackerItemDto> allTrackerItems =null;
+		List<Object> allAssoc = null;
+		  
+	    if (readerObject.getWikiContext())	//check if user chooses wikicontext or tracker 
+		{
+			//read WikiPage
+			wiki = slreader.readWikiPage(readerObject.getWikiID());	//TODO: statisch
+			
+			//find all Associations related to all wikipages in this specific project
+			allAssoc = slreader.readAllAssociationsWiki();	
+		}
+		else
+		{
+			//read TrackerItems
+			allTrackerItems = slreader.readAllTrackerItems(readerObject.getTrackerID(), flag); 
 		
+			//find all Associations in this specific project
+		    allAssoc = slreader.readAllAssociationsTracker();	
+		}
+
+		//**********************logic*************	
+		//if user chooses wikicontext, checks all artifacts linked to WikiPage
+		if (readerObject.getWikiContext())	
+		{
+			results = logic.checkWikiPages(wiki, null, allAssoc);
+		}
+		//check whether Attachments or TrackerItems have to check
+		else if (readerObject.getProjectId()==null) //checks TrackerItem
+		{
+			//check if every TrackerItem has minimum one association
+			results = logic.checkTrackerItems(allTrackerItems, null, allAssoc);
+		}
+			
 		//**********************Print*************
 		String output ="";
 		if (readerObject.getDisplay() == "chart") //"chart"-parameter
@@ -86,8 +114,18 @@ public class SpicyAlm extends AbstractCodeBeamerWikiPlugin {
 			// set up Velocity context
 			VelocityContext velocityContext = getDefaultVelocityContextFromContext(context);
 			
+			List<VelocityTable> table = null;
+			
+			//print wikicontext 
+			if (readerObject.getWikiContext())
+			{
+				velocityContext.put("table", printer.printWikPagesAscii(results, false));
+				velocityContext.put("support", velocitySupport );
+				return renderPluginTemplate("spicyAlm withArtifacts.vm", velocityContext);
+			}
+			
 			//check whether Attachments or TrackerItems have to print
-			if (readerObject.getProjectId()!=null)
+			else if (readerObject.getProjectId()!=null)
 			{
 				velocityContext.put("table", printer.printAttachmentsAscii(results));	 //TODO: in Process
 				velocityContext.put("support", velocitySupport );	 
@@ -112,7 +150,6 @@ public class SpicyAlm extends AbstractCodeBeamerWikiPlugin {
 		return output;
 		
 	}
-
 	
 	/**
 	 * Add flag value 

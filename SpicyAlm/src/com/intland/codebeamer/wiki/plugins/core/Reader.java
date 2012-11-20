@@ -22,17 +22,19 @@ public class Reader {
 	private String url ="noValue";
 	private String display ="table"; 
 	private String projectName;		
-	private int[] projectId =null;
+	private int[] projectID =null;
 	private int[] trackerID =null;	
 	private String user ="noValue";
 	private String password ="noValue";
 	private int outputLimitation =100;	//standard value for output
 	private boolean artifactLimation = false;
-
-	private Boolean notLinked = false;
-	private Boolean tracker = false;
-
+	private boolean wikiContext = false; //if user want to use the wiki context 
+	private boolean notLinked = false;
+	private boolean tracker = false;
 	
+	private int wikiID = 0;	//wikipage id
+
+
 	Reader readerObject = null;
 	
 	GlobalVariable globalVariable = null;
@@ -55,6 +57,39 @@ public class Reader {
 	{
 		this.globalVariable = globalVariable;
 		this.velocitySupport = velocitySupport;
+	}
+	
+	public int getWikiID() {
+		return wikiID;
+	}
+
+	/**Set wikipage id and convert string to int value
+	 * @param string
+	 */
+	public void setWikiID(String string) {
+		
+		int temp=0;
+		try {
+			 temp = Integer.parseInt(string);
+		} 
+			catch (NumberFormatException e) {
+				System.out.println("i ist keine Zahl. " + e.getMessage());
+			}
+		
+		this.wikiID = temp;
+	}
+	
+	public boolean getWikiContext() {
+		return wikiContext;
+	}
+
+	public void setwikiContext(String wikiContext) {
+		if (wikiContext.contains("true"))
+		{
+			this.wikiContext = true;
+		}
+		else
+			this.wikiContext = false;
 	}
 	
 	/**Get number for output limitation
@@ -162,7 +197,7 @@ public class Reader {
 	}
 
 	public void setProjectName(String projectName) {
-		this.projectId=null; //set default-value, not both are allowed
+		this.projectID=null; //set default-value, not both are allowed
 		this.projectName = projectName;
 	}
 
@@ -261,6 +296,7 @@ public class Reader {
 		String noLinked = (String)params.get("notLinked");
 		String outputLimitation = (String)params.get("outputLimit");
 		String artifactLimitation = (String)params.get("artifactLimit");
+		String wikiContext = (String)params.get("wikiContext");
 		
 		//required to avoid "nullpointerexceptions" when user missed these parameters 		
 		//necessary parameters
@@ -313,6 +349,16 @@ public class Reader {
 		{
 			System.out.println("Necessary Parameters are missing. " + e.getMessage());
 		}
+		
+		try 
+		{
+			if(!wikiContext.isEmpty())
+				this.setwikiContext(wikiContext);
+		}
+		catch (NullPointerException e)
+		{
+			System.out.println("Necessary Parameters are missing. " + e.getMessage());
+		}
 			
 	}
 
@@ -336,6 +382,7 @@ public class Reader {
 		String trackerId = (String)params.get("trackerId");		
 		String outputLimitation = (String)params.get("outputLimit");
 		String artifactLimitation = (String)params.get("artifactLimit");
+		String wikiContext = (String)params.get("wikiContext");
 		
 		//String projectName = (String)params.get("projectName");	//String
 		String projectId = (String)params.get("projectId");		//number
@@ -408,6 +455,17 @@ public class Reader {
 			System.out.println("Necessary Parameters are missing. " + e.getMessage());
 		}
 	
+		try 
+		{
+			if(!wikiContext.isEmpty())
+				this.setwikiContext(wikiContext);
+		}
+		catch (NullPointerException e)
+		{
+			System.out.println("Necessary Parameters are missing. " + e.getMessage());
+		}
+		
+		
 		//not required values
 		try //TODO: in process
 		{
@@ -424,7 +482,7 @@ public class Reader {
 	}
 	
 	public int[] getProjectId() {
-		return projectId;
+		return projectID;
 	}
 
 	public void setProjectId(String projectId) {
@@ -444,7 +502,7 @@ public class Reader {
 			}
 		}
 		
-		this.projectId =ArrayUtils.toPrimitive(tempArray.toArray(new Integer[tempArray.size()]));		
+		this.projectID =ArrayUtils.toPrimitive(tempArray.toArray(new Integer[tempArray.size()]));		
 	}
 
 	public String getDisplay() {
