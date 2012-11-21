@@ -3,9 +3,9 @@
 <table>
     	<tbody>
 <tr>
-<th>Ticket id</th>
-<th>Ticket name</th>
-<th>Artifakt name	</th>
+<th>ID</th>
+<th>Name</th>
+<th>Artifact name	</th>
 </tr>
 <tr>
     #foreach($object in $table)
