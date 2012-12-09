@@ -34,7 +34,7 @@ import com.intland.codebeamer.wiki.plugins.support.VelocityTable;
  * Velocity templates are available in project folder /velocityTemplate
  * both have to be copied into codebeamer folder ...\tomcat\webapps\cb\config\templates\wiki-plugin
  */
-public class SpicyAlm extends AbstractCodeBeamerWikiPlugin {
+public class AssociationCount extends AbstractCodeBeamerWikiPlugin {
 	
 	
 	private Set<TrackerItemDto.Flag> flag = null;

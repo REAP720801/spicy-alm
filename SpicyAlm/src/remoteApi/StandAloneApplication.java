@@ -42,7 +42,15 @@ public class StandAloneApplication {
 		//configuration parameters
 		String serviceUrl = "http://localhost:8080/cb/remote-api";
 		String login ="bond";
-		String password = "007";	
+		String password = "007";
+		
+		//String serviceUrl ="http://wifo1-54.bwl.uni-mannheim.de:8080/cb/remote-api";
+		//String login ="IS613_D_Boersch";
+		//String password = "a123456";		
+		
+		//String serviceUrl="https://codebeamer.com/cb/remote-api";
+		//String login ="aboersch";
+		//String password = "a123456";	
 		
 		//configuration user simulated parameters
 		Map<String, String> map = new HashMap<String, String>();
@@ -50,7 +58,7 @@ public class StandAloneApplication {
 		map.put("user", login);
 		map.put("password", password);
 		//map.put("projectId", "2");	 //TODO: in process
-		map.put("display", "table");	//input: chart or table
+		map.put("display", "chart");	//input: chart or table
 		map.put("trackerId", "5,6,7");	    //Pattern: specific values as int,int,int,... or for a full search use: "" -->alle
 		map.put("notLinked", "false");
 		map.put("outputLimit", "100");
