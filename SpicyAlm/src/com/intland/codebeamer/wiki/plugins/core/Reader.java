@@ -31,6 +31,9 @@ public class Reader {
 	private boolean wikiContext = false; //if user want to use the wiki context 
 	private boolean notLinked = false;
 	private boolean tracker = false;
+	private boolean error = false;	//
+	
+	public String errorMessage = "following errors occurred:"; //global variable for error message share
 	
 	private int wikiID = 0;	//wikipage id
 
@@ -90,6 +93,19 @@ public class Reader {
 		}
 		else
 			this.wikiContext = false;
+	}
+	
+	public boolean getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		if (error.contains("true"))
+		{
+			this.error = true;
+		}
+		else
+			this.error  = false;
 	}
 	
 	/**Get number for output limitation
@@ -297,6 +313,7 @@ public class Reader {
 		String outputLimitation = (String)params.get("outputLimit");
 		String artifactLimitation = (String)params.get("artifactLimit");
 		String wikiContext = (String)params.get("wikiContext");
+		String error = (String)params.get("error");
 		
 		//required to avoid "nullpointerexceptions" when user missed these parameters 		
 		//necessary parameters
@@ -359,6 +376,17 @@ public class Reader {
 		{
 			System.out.println("Necessary Parameters are missing. " + e.getMessage());
 		}
+		
+		try 
+		{
+			if(!error.isEmpty())
+				this.setError(error);
+		}
+		catch (NullPointerException e)
+		{
+			System.out.println("Necessary Parameters are missing. " + e.getMessage());
+		}
+			
 			
 	}
 

@@ -100,6 +100,11 @@ public class AssociationCount extends AbstractCodeBeamerWikiPlugin {
 			results = logic.checkTrackerItems(allTrackerItems, null, allAssoc);
 		}
 			
+		if (readerObject.getError())	//print possible Errors on display 
+		{
+			return readerObject.errorMessage;
+		}
+		
 		//**********************Print*************
 		String output ="";
 		if (readerObject.getDisplay() == "chart") //"chart"-parameter

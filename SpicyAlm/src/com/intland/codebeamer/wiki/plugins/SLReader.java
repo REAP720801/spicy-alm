@@ -113,36 +113,81 @@ public class SLReader {
 	/**Returns all available Associations for current user
 	 * @return  List<Object> List of Object[] pattern: [0]=assoc-object [1]=trackerItem-object [2]=attachment-object)
 	 */
-	//TODO: not always TrackerItemDto object
 	public List<Object> readAllAssociationsTracker()	//from current project
 	{
+		List<Object> allAssoc = new ArrayList<Object>();
+		String tempString ="";
+		
+		try {
 		//all Associations, unabhängig welcher Tracker
 		List<AssociationDto<?,?>> tempAllAssoc = AssociationManager.getInstance().findAll(user);
-		List<Object> allAssoc = new ArrayList<Object>();
 		
-		Iterator<AssociationDto<?, ?>> itrAllAssoc = tempAllAssoc.iterator();
+		Iterator<AssociationDto<?, ?>> itrAllAssoc =null;
+		try {
+			itrAllAssoc = tempAllAssoc.iterator();
+   		}
+			catch (NullPointerException e)
+		{
+			readerObject.errorMessage = readerObject.errorMessage +  " 1.0 " + e.getMessage();
+		}
+		
 	   	while(itrAllAssoc.hasNext()) {	//goes through AssociationDto<?,?>-List
 	   		AssociationDto<?, ?> tempAssoc = itrAllAssoc.next();
-	   		AssociationDto<?, ?> assoc = AssociationManager.getInstance().findById(user, tempAssoc.getId());	
+	   		AssociationDto<?, ?> assoc = null;
 	   		
-				ReferableDto originTo = assoc.getTo().getDto();
-				ReferableDto originFrom = assoc.getFrom().getDto();
+	   		try {
+	   			assoc = AssociationManager.getInstance().findById(user, tempAssoc.getId());
+	   			tempString =  tempAssoc.getId().toString();
+	   		}
+   			catch (NullPointerException e)
+			{
+				readerObject.errorMessage = readerObject.errorMessage +  " 1.1 " + e.getMessage();
+			}
+	   		
+	   		ReferableDto originTo = null;
+	   		ReferableDto originFrom = null;
 
-				ArtifactDto toArtifact =null;
-				TrackerItemDto fromItem =null;
-				
-				if (originTo instanceof TrackerItemDto) {
+	   		try {
+				 originTo = assoc.getTo().getDto();
+				 originFrom = assoc.getFrom().getDto();				
+	   		}
+	   		catch (NullPointerException e)
+			{
+				readerObject.errorMessage = readerObject.errorMessage +  " 1.2 " + e.getMessage() + " " +tempString;
+			}		
+
+			ArtifactDto toArtifact =null;
+			TrackerItemDto fromItem =null;
+			
+			if (originTo instanceof TrackerItemDto) {
+				try {		//to avoid CastExceptions
 					fromItem = (TrackerItemDto) originTo;
 					toArtifact = (ArtifactDto) originFrom;
-					 
-				}
+					}
+					catch (ClassCastException e)
+					{
+						readerObject.errorMessage = readerObject.errorMessage +  " 1.3 " + e.getMessage() + " " +tempString;
+					}
+		   			catch (NullPointerException e)
+					{
+						readerObject.errorMessage = readerObject.errorMessage +  " 1.4 " + e.getMessage() + " " +tempString;
+					}
+			}
 
-				else if (originFrom instanceof TrackerItemDto) {
+			else if (originFrom instanceof TrackerItemDto) {
+					try {	  //to avoid CastExceptions
 						fromItem = (TrackerItemDto) originFrom;
 						toArtifact =(ArtifactDto) originTo;
-				 }	
-				
-				
+					}
+					catch (ClassCastException e)
+					{
+						readerObject.errorMessage = readerObject.errorMessage + " 1.5 " + e.getMessage() + " " +tempString;
+					}
+		   			catch (NullPointerException e)
+					{
+						readerObject.errorMessage = readerObject.errorMessage +  " 1.6 " + e.getMessage() + " " +tempString;
+					}
+			}	
 				
 				if (toArtifact!=null && fromItem !=null)
 				{
@@ -158,6 +203,11 @@ public class SLReader {
 				//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
 				}
 			}
+		}
+		catch (NullPointerException e)
+		{
+			readerObject.errorMessage = readerObject.errorMessage +  " 1.7 " + e.getMessage();
+		}
 		return allAssoc;
 	} 
 
@@ -182,40 +232,87 @@ public class SLReader {
 	 */
 	public List<Object> readAllAssociationsWiki()	
 	{
+		List<Object> allAssoc = new ArrayList<Object>();
+		String tempString ="";
+		
+		try {
 		//all Associations
 		List<AssociationDto<?,?>> tempAllAssoc = AssociationManager.getInstance().findAll(user);
-		List<Object> allAssoc = new ArrayList<Object>();
 		
-		Iterator<AssociationDto<?, ?>> itrAllAssoc = tempAllAssoc.iterator();
+		Iterator<AssociationDto<?, ?>> itrAllAssoc =null;
+		try {
+			itrAllAssoc = tempAllAssoc.iterator();
+   		}
+			catch (NullPointerException e)
+		{
+			readerObject.errorMessage = readerObject.errorMessage +  " 2.0 " + e.getMessage();
+		}
+		
 	   	while(itrAllAssoc.hasNext()) {	//goes through AssociationDto<?,?>-List
 	   		AssociationDto<?, ?> tempSingleAssoc = itrAllAssoc.next();
-	   		AssociationDto<?, ?> assoc = AssociationManager.getInstance().findById(user, tempSingleAssoc.getId());	
-	   				
-			ReferableDto originFrom = assoc.getFrom().getDto();
-			ReferableDto originTo = assoc.getTo().getDto();
+	   		AssociationDto<?, ?> assoc = null;
+	   		
+	   		try {
+	   			assoc = AssociationManager.getInstance().findById(user, tempSingleAssoc.getId());	
+	   			tempString =  tempSingleAssoc.getId().toString();
+	   		}
+   			catch (NullPointerException e)
+			{
+				readerObject.errorMessage = readerObject.errorMessage +  " 2.1 " + e.getMessage();
+			}		
+	   		
+	   		ReferableDto originFrom = null;
+	   		ReferableDto originTo = null;
+	   		
+	   		try {
+				originFrom = assoc.getFrom().getDto();
+				originTo = assoc.getTo().getDto();
+	   		}
+   			catch (NullPointerException e)
+			{
+				readerObject.errorMessage = readerObject.errorMessage +  " 2.2 " + e.getMessage() + " " +tempString;
+			}	
 
 			WikiPageDto wikiPage =null;
 			ArtifactDto artifact = null;
 			
 			if (originFrom instanceof WikiPageDto) {
+				try {		//to avoid CastExceptions
 				wikiPage = (WikiPageDto) originFrom;
 				artifact = (ArtifactDto)originTo;
+				}
+				catch (ClassCastException e)
+				{
+					readerObject.errorMessage = readerObject.errorMessage +  " 2.3 " + e.getMessage() + " " +tempString;
+				}
 			}
 			
-			if (originTo instanceof WikiPageDto) {
-				wikiPage = (WikiPageDto) originTo;
-				artifact = (ArtifactDto) originFrom;
-				
-				if (artifact instanceof WikiPageDto)
+		if (originTo instanceof WikiPageDto) {
+				try {		//to avoid CastExceptions
+					wikiPage = (WikiPageDto) originTo;
+					artifact = (ArtifactDto) originFrom;
+				}
+				catch (ClassCastException e)
 				{
-					//change objects, one use case could be that two wikipages are linked to each other and this part corrects the order
+					readerObject.errorMessage = readerObject.errorMessage +  " 2.4 " + e.getMessage() + " " +tempString;
+				}
+			
+			if (artifact instanceof WikiPageDto)
+			{
+				//change objects, one use case could be that two wikipages are linked to each other and this part corrects the order
+				try {		//to avoid CastExceptions
 					WikiPageDto temp = wikiPage;
 					wikiPage = (WikiPageDto)artifact;
 					artifact = temp;
-				}	
-			}
+				}
+				catch (ClassCastException e)
+				{
+					readerObject.errorMessage = readerObject.errorMessage +  " 2.5 " + e.getMessage() + " " +tempString;
+				}
+			}	
+		}
 				
-				if (wikiPage !=null){
+				if (wikiPage !=null && artifact != null){
 				//System.out.println("READ: " + wikiPage.getName() + " "  + wikiPage.getId());
 				Object[] tempAssoc = new Object [3]; //[0]=AssociationDto object [1]=trackerItem object [2]=attachment object)
 				tempAssoc[0] = assoc;
@@ -232,6 +329,11 @@ public class SLReader {
 				//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
 				}
 			}
+		}
+		catch (NullPointerException e)
+		{
+			readerObject.errorMessage = readerObject.errorMessage +  " 2.6 " + e.getMessage();
+		}
 		
 		return allAssoc;
 	}
