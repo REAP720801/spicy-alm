@@ -172,7 +172,6 @@ public class Printer {
 		   				}
 		   				counter++;
 		   				}
-		   			
 		   		
 		   	
 		   	return list;

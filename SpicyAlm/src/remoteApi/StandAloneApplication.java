@@ -58,12 +58,15 @@ public class StandAloneApplication {
 		map.put("user", login);
 		map.put("password", password);
 		//map.put("projectId", "2");	 //TODO: in process
-		map.put("display", "chart");	//input: chart or table
-		map.put("trackerId", "5,6,7");	    //Pattern: specific values as int,int,int,... or for a full search use: "" -->alle
+		map.put("display", "table");	//input: chart or table
+		map.put("trackerId", "3");	    //Pattern: specific values as int,int,int,... or for a full search use: "" -->alle
 		map.put("notLinked", "false");
 		map.put("outputLimit", "100");
-		map.put("artifactLimit", "file");
+		map.put("artifactLimit", "");
 		map.put("wikiContext", "false");	
+		
+	//TODO: LOGIK ist fehlerhaft geworden, api-check durchführen
+		//bsp: es werden falsche Artifakte zu Tickets zugemacht, artifacte sind vorhanden die nicht auswählbar sind bsp. .jpg oder andere docs, oder calender
 		
 		//read user parameters
 		readerObject.readParameterSAloneApp(map);

@@ -12,10 +12,12 @@ import com.intland.codebeamer.manager.ArtifactManager;
 import com.intland.codebeamer.manager.AssociationManager;
 import com.intland.codebeamer.manager.ProjectManager;
 import com.intland.codebeamer.manager.TrackerItemManager;
+import com.intland.codebeamer.manager.TrackerManager;
 import com.intland.codebeamer.manager.WikiPageManager;
 import com.intland.codebeamer.persistence.dto.ArtifactDto;
 import com.intland.codebeamer.persistence.dto.AssociationDto;
 import com.intland.codebeamer.persistence.dto.ProjectDto;
+import com.intland.codebeamer.persistence.dto.ReadOnlyArtifactDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto;
 import com.intland.codebeamer.persistence.dto.TrackerItemDto.Flag;
 import com.intland.codebeamer.persistence.dto.UserDto;
@@ -121,7 +123,7 @@ public class SLReader {
 		try {
 		//all Associations, unabhängig welcher Tracker
 		List<AssociationDto<?,?>> tempAllAssoc = AssociationManager.getInstance().findAll(user);
-		
+	
 		Iterator<AssociationDto<?, ?>> itrAllAssoc =null;
 		try {
 			itrAllAssoc = tempAllAssoc.iterator();
@@ -153,42 +155,64 @@ public class SLReader {
 	   		}
 	   		catch (NullPointerException e)
 			{
+	   			//can occur when it is linked to URL, because than it is no object available
 				readerObject.errorMessage = readerObject.errorMessage +  " 1.2 " + e.getMessage() + " " +tempString;
 			}		
 
 			ArtifactDto toArtifact =null;
 			TrackerItemDto fromItem =null;
 			
-			if (originTo instanceof TrackerItemDto) {
-				try {		//to avoid CastExceptions
-					fromItem = (TrackerItemDto) originTo;
-					toArtifact = (ArtifactDto) originFrom;
-					}
-					catch (ClassCastException e)
-					{
-						readerObject.errorMessage = readerObject.errorMessage +  " 1.3 " + e.getMessage() + " " +tempString;
-					}
-		   			catch (NullPointerException e)
-					{
-						readerObject.errorMessage = readerObject.errorMessage +  " 1.4 " + e.getMessage() + " " +tempString;
-					}
+			try {		//to avoid CastExceptions
+				//ignore all other combinations of ticket -> ticket or wikipage,...
+				if (originFrom instanceof TrackerItemDto) {
+					fromItem = (TrackerItemDto) originFrom;
+				}
 			}
-
-			else if (originFrom instanceof TrackerItemDto) {
-					try {	  //to avoid CastExceptions
-						fromItem = (TrackerItemDto) originFrom;
-						toArtifact =(ArtifactDto) originTo;
-					}
-					catch (ClassCastException e)
-					{
-						readerObject.errorMessage = readerObject.errorMessage + " 1.5 " + e.getMessage() + " " +tempString;
-					}
-		   			catch (NullPointerException e)
-					{
-						readerObject.errorMessage = readerObject.errorMessage +  " 1.6 " + e.getMessage() + " " +tempString;
-					}
-			}	
+			catch (ClassCastException e)
+			{
+				readerObject.errorMessage = readerObject.errorMessage +  " 1.3 " + e.getMessage() + " " +tempString;
+			}
+	   		catch (NullPointerException e)
+			{
+				readerObject.errorMessage = readerObject.errorMessage +  " 1.4 " + e.getMessage() + " " +tempString;
+			}
+		//**********************		
+			try {
+				if (originTo instanceof ArtifactDto) {
+					toArtifact = (ArtifactDto) originTo;	//ArtifactDto can be like a directory, a document (file, wiki page, report)
+				}	
 				
+			}
+			catch (ClassCastException e)
+			{
+				readerObject.errorMessage = readerObject.errorMessage +  " 1.5 " + e.getMessage() + " " +tempString;
+			}
+	   		catch (NullPointerException e)
+			{
+				readerObject.errorMessage = readerObject.errorMessage +  " 1.6 " + e.getMessage() + " " +tempString;
+			}	
+	//*************************			
+			try {
+				//it is possible that instead of Ticket --> Artifact, the combination Artifact -->Ticket occurs in codebeamer. For further logical-correctness they get change to normal pattern
+				if (originTo instanceof TrackerItemDto)
+				{
+					if (originFrom instanceof ArtifactDto)
+					{
+						fromItem = (TrackerItemDto) originTo;
+						toArtifact = (ArtifactDto) originFrom;
+					}
+				}
+			}
+			catch (ClassCastException e)
+			{
+				readerObject.errorMessage = readerObject.errorMessage +  " 1.7 " + e.getMessage() + " " +tempString;
+			}
+   			catch (NullPointerException e)
+			{
+				readerObject.errorMessage = readerObject.errorMessage +  " 1.8 " + e.getMessage() + " " +tempString;
+			}
+			
+			
 				if (toArtifact!=null && fromItem !=null)
 				{
 				Object[] tempFinalAssoc = new Object [3]; //[0]=AssociationDto object [1]=trackerItem object [2]=attachment object)
@@ -206,7 +230,7 @@ public class SLReader {
 		}
 		catch (NullPointerException e)
 		{
-			readerObject.errorMessage = readerObject.errorMessage +  " 1.7 " + e.getMessage();
+			readerObject.errorMessage = readerObject.errorMessage +  " 1.9 " + e.getMessage();
 		}
 		return allAssoc;
 	} 
@@ -276,41 +300,56 @@ public class SLReader {
 			WikiPageDto wikiPage =null;
 			ArtifactDto artifact = null;
 			
-			if (originFrom instanceof WikiPageDto) {
-				try {		//to avoid CastExceptions
-				wikiPage = (WikiPageDto) originFrom;
-				artifact = (ArtifactDto)originTo;
+			//ignores all other combinations of ticket -> ticket or wikipage,...
+				try {		//to avoid CastExceptions		
+					if (originTo instanceof ArtifactDto) {
+						artifact = (ArtifactDto) originTo;
+					}
+				
 				}
 				catch (ClassCastException e)
 				{
 					readerObject.errorMessage = readerObject.errorMessage +  " 2.3 " + e.getMessage() + " " +tempString;
 				}
-			}
-			
-		if (originTo instanceof WikiPageDto) {
-				try {		//to avoid CastExceptions
-					wikiPage = (WikiPageDto) originTo;
-					artifact = (ArtifactDto) originFrom;
-				}
-				catch (ClassCastException e)
+		   		catch (NullPointerException e)
 				{
 					readerObject.errorMessage = readerObject.errorMessage +  " 2.4 " + e.getMessage() + " " +tempString;
 				}
-			
-			if (artifact instanceof WikiPageDto)
-			{
-				//change objects, one use case could be that two wikipages are linked to each other and this part corrects the order
-				try {		//to avoid CastExceptions
-					WikiPageDto temp = wikiPage;
-					wikiPage = (WikiPageDto)artifact;
-					artifact = temp;
+		//********************
+				try{
+	
+					if (originFrom instanceof WikiPageDto ) {
+							wikiPage = (WikiPageDto) originFrom;
+					}					
 				}
 				catch (ClassCastException e)
 				{
 					readerObject.errorMessage = readerObject.errorMessage +  " 2.5 " + e.getMessage() + " " +tempString;
 				}
-			}	
-		}
+		   		catch (NullPointerException e)
+				{
+					readerObject.errorMessage = readerObject.errorMessage +  " 2.6 " + e.getMessage() + " " +tempString;
+				}
+				
+		//*********************direction artifact ->wikiPage
+				try{
+					if (originTo instanceof WikiPageDto)
+					{
+						if (originFrom instanceof ArtifactDto)
+						{
+							wikiPage = (WikiPageDto) originTo;
+							artifact = (ArtifactDto) originFrom;
+						}
+					}
+				}
+				catch (ClassCastException e)
+				{
+					readerObject.errorMessage = readerObject.errorMessage +  " 2.7 " + e.getMessage() + " " +tempString;
+				}
+		   		catch (NullPointerException e)
+				{
+					readerObject.errorMessage = readerObject.errorMessage +  " 2.8 " + e.getMessage() + " " +tempString;
+				}
 				
 				if (wikiPage !=null && artifact != null){
 				//System.out.println("READ: " + wikiPage.getName() + " "  + wikiPage.getId());
@@ -318,23 +357,21 @@ public class SLReader {
 				tempAssoc[0] = assoc;
 				tempAssoc[1] = wikiPage;  //wikiPage
 				tempAssoc[2] = artifact; //artifact
-								
+				
 				//limitation check "file" 
 				if (readerObject.getArtifactLimitation() && (artifact.getTypeId() == GlobalVariable.attachmentType_externalFile)  )
 					allAssoc.add(tempAssoc);	//add only Association which has an artifact of type "external file" according to user input
 				if (!readerObject.getArtifactLimitation()) //for no user artifact limitation 
 					allAssoc.add(tempAssoc);	
 			
-				
 				//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
 				}
 			}
 		}
 		catch (NullPointerException e)
 		{
-			readerObject.errorMessage = readerObject.errorMessage +  " 2.6 " + e.getMessage();
+			readerObject.errorMessage = readerObject.errorMessage +  " 2.11 " + e.getMessage();
 		}
-		
 		return allAssoc;
 	}
 }

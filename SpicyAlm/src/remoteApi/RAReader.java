@@ -295,19 +295,29 @@ public class RAReader {
 					TrackerItemDto trackerItem = null;
 					ArtifactDto artifact = null;
 					
-					//pre-check 
-					Object tempObject = api.findTrackerItemById(token, assoc.getFrom().getId());  //trackeritem
-					if (tempObject instanceof TrackerItemDto)
+					//pre-check TrackerItem because both directions are possible
+					Object tempTrackerObject = api.findTrackerItemById(token, assoc.getFrom().getId());  //trackeritem
+					if (tempTrackerObject instanceof TrackerItemDto)
 					{
-						trackerItem = (TrackerItemDto) tempObject;
-					    artifact = api.findArtifactById(token, assoc.getTo().getId());
+						trackerItem = (TrackerItemDto) tempTrackerObject;
 					}
 					
-					//pre-check 
-					tempObject = api.findTrackerItemById(token, assoc.getTo().getId());  //trackeritem
-					if (tempObject instanceof TrackerItemDto) {
-						trackerItem = (TrackerItemDto) tempObject;
-						artifact = api.findArtifactById(token, assoc.getFrom().getId());
+					//pre-check TrackerItem
+					tempTrackerObject = api.findTrackerItemById(token, assoc.getTo().getId());  //trackeritem
+					if (tempTrackerObject instanceof TrackerItemDto) {
+						trackerItem = (TrackerItemDto) tempTrackerObject;
+					}
+					
+					//pre-check Artifact
+					Object tempArtifactObject = api.findArtifactById(token, assoc.getTo().getId());
+					if (tempArtifactObject instanceof ArtifactDto) {
+						artifact = (ArtifactDto) tempArtifactObject;
+					}
+					
+					//pre-check Artifact
+					tempArtifactObject = api.findArtifactById(token, assoc.getFrom().getId());
+					if (tempArtifactObject instanceof ArtifactDto) {
+						artifact = (ArtifactDto) tempArtifactObject;
 					}
 					
 					if (trackerItem !=null && artifact!=null )
@@ -323,7 +333,7 @@ public class RAReader {
 					if (!readerObject.getArtifactLimitation()) //for no user artifact limitation 
 						allAssoc.add(tempAssoc);	
 					
-					//System.out.println(assoc.getId() +" " +assoc.getFrom().getId() + " " + assoc.getTo().getId());
+					//System.out.println(trackerItem.getName() + " " + artifact.getName());
 					}
 				}
 			}
