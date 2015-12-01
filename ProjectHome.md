@@ -1,0 +1,3 @@
+Codebeamer is an application lifecycle management software for distributed collaborative software development teams. However, the entire suite does not cover special requirements that for example come from the automotive industry. In order to be conform with prevailing development requirements (e.g. SPICE) this project aims at developing additional open source plugins for ensuring the required process conformity and improving the software quality of these projects.
+
+The project was initiated as a joint collaboration of Hirschmann Car Communications and the Institute for Enterprise Services (University of Mannheim) in April 2012.
